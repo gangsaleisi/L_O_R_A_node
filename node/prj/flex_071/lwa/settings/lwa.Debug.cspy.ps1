@@ -23,9 +23,9 @@ param([String]$debugfile = "");
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\MyGit\node_v1.0\prj\flex_071\lwa\settings\lwa.Debug.general.xcl" --backend -f "E:\MyGit\node_v1.0\prj\flex_071\lwa\settings\lwa.Debug.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\MyGit\node\prj\flex_071\lwa\settings\lwa.Debug.general.xcl" --backend -f "E:\MyGit\node\prj\flex_071\lwa\settings\lwa.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\MyGit\node_v1.0\prj\flex_071\lwa\settings\lwa.Debug.general.xcl" --debug_file=$debugfile --backend -f "E:\MyGit\node_v1.0\prj\flex_071\lwa\settings\lwa.Debug.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\MyGit\node\prj\flex_071\lwa\settings\lwa.Debug.general.xcl" --debug_file=$debugfile --backend -f "E:\MyGit\node\prj\flex_071\lwa\settings\lwa.Debug.driver.xcl" 
 }

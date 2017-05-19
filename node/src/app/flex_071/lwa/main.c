@@ -34,6 +34,7 @@ volatile bool ReportTimerEvent = false;
 extern Gpio_t Led;
 
 uint8_t loramac_evt_flag = 0;
+uint8_t loramac_join_flag = 0;
 LoRaMacRxInfo *loramac_rx_info;
 lm_evt_t loramac_evt;
 
@@ -67,8 +68,11 @@ int main( void )
 {
     BoardInitMcu( );
     BoardInitPeriph( );
-
+    
+    
     app_lm_init(app_lm_cb);
+
+    app_lm_para_init();
 
     /* Uncomment below line to enable class C mode */
     //LoRaMacSetDeviceClass(CLASS_C);
@@ -90,19 +94,24 @@ int main( void )
             GpioWrite( &Led, 1 );
             DelayMs( 5 );
             GpioWrite( &Led, 0 );
-            sprintf((char *)AppData, "%8.2f", (double)get_sensor_value());
-            //AppData[7] = '\0';
-           // memcpy(AppData, "risingh1", 8);
-            //jason
-            //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-            if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-            sys_sta = SYS_STA_WAIT;
-            }else{
-                sys_sta = SYS_STA_IDLE;
-                ReportTimerEvent = false;
-                TimerStop( &ReportTimer );
-                TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
-                TimerStart( &ReportTimer );
+            if( loramac_join_flag == 0 && app_lm_get_mode() == OTA){
+              app_lm_join();
+              sys_sta = SYS_STA_WAIT;
+            }
+            else
+            {
+              sprintf((char *)AppData, "%8.2f", (double)get_sensor_value());
+              //jason
+              //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
+              if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
+              sys_sta = SYS_STA_WAIT;
+              }else{
+                  sys_sta = SYS_STA_IDLE;
+                  ReportTimerEvent = false;
+                  TimerStop( &ReportTimer );
+                  TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+                  TimerStart( &ReportTimer );
+              }
             }
             break;
         case SYS_STA_WAIT:

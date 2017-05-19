@@ -2141,6 +2141,9 @@
             <name>$PROJ_DIR$\..\..\..\src\sensor\adc.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\..\src\sensor\flash.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\src\sensor\i2c-board.c</name>
         </file>
         <file>

@@ -6,7 +6,7 @@
 #define TEMP_0_VOL      (500)
 #define ADC_MAX_VALUE    4095
 #define VREFINT_CAL           ( *( uint16_t* )0x1FF80078 )
-#define FACTORY_POWER_SUPPLY             3300 // mV
+#define FACTORY_POWER_SUPPLY             3000 // mV
 
 //MCP9800
 #define MCP_I2C_ADDRESS     0x48 //1001000

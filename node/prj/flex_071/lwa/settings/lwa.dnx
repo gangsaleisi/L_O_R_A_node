@@ -18,7 +18,7 @@
         <stlinkResetStrategy>3</stlinkResetStrategy>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>3539334938</Checksum>
+        <Checksum>1879043722</Checksum>
     </DebugChecksum>
     <JLinkDriver>
         <CStepIntDis>_ 0</CStepIntDis>
@@ -67,7 +67,15 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Count>0</Count>
+        <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\flex_071\lwa\main.c}.104.17" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\flex_071\lwa\main.c}.121.13" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\system\timer.c}.289.17" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\system\timer.c}.209.5" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\system\timer.c}.132.13" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\rtc-board.c}.548.5" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\rtc-board.c}.550.5" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\rtc-board.c}.600.5" 0 0 1 "" 0 "" 0</Bp7>
+        <Count>8</Count>
     </Breakpoints2>
     <Aliases>
         <A0>_ "E:\lora\lora-node\rhf76-052-lorawan-api-v0.3\src\lib\lorawan-node\src\radio\sx1276\sx1276.c" ""</A0>

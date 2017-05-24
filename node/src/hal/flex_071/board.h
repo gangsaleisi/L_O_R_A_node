@@ -26,6 +26,7 @@ Description: loramac-node board dependent definitions
 #include "gpio.h"
 #include "adc.h"
 #include "spi.h"
+#include "uart.h"
 #include "i2c.h"
 #include "flash.h"
 #include "radio.h"
@@ -33,7 +34,7 @@ Description: loramac-node board dependent definitions
 #include "rtc-board.h"
 #include "timer-board.h"
 #include "sx1276-board.h"
-
+#include "uart-board.h"
 /*!
  * NULL definition
  */
@@ -111,6 +112,9 @@ Description: loramac-node board dependent definitions
 #define SWDIO                                       PA_13
 #define SWCLK                                       PA_14
 
+#define UART_TX                                     PA_2
+#define UART_RX                                     PA_3
+
 #define LED                                         PA_0
 /*!
  * \brief Initializes the target board peripherals.
@@ -121,6 +125,15 @@ void BoardInitMcu( void );
  * \brief Initializes the boards peripherals.
  */
 void BoardInitPeriph( void );
+
+void BoardDisableIrq( void );
+
+/*!
+ * \brief Enable interrupts
+ *
+ * \remark IRQ nesting is managed
+ */
+void BoardEnableIrq( void );
 
 /*!
  * \brief De-initializes the target board peripherals to decrease power

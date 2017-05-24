@@ -69,7 +69,9 @@ int main( void )
     BoardInitMcu( );
     BoardInitPeriph( );
     
+    GetDevID();
     
+#if 0
     app_lm_init(app_lm_cb);
 
     app_lm_para_init();
@@ -133,5 +135,6 @@ int main( void )
 
         TimerLowPowerHandler( );
     }
+#endif
 }
 

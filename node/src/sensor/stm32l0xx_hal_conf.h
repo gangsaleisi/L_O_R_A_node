@@ -63,7 +63,7 @@
 //#define HAL_SPI_MODULE_ENABLED   
 //#define HAL_TIM_MODULE_ENABLED   
 //#define HAL_TSC_MODULE_ENABLED   
-//#define HAL_UART_MODULE_ENABLED   
+#define HAL_UART_MODULE_ENABLED   
 //#define HAL_USART_MODULE_ENABLED   
 //#define HAL_IRDA_MODULE_ENABLED   
 //#define HAL_SMARTCARD_MODULE_ENABLED   
@@ -73,10 +73,10 @@
 //#define HAL_GPIO_MODULE_ENABLED
 //#define HAL_DMA_MODULE_ENABLED
 #define HAL_I2C_MODULE_ENABLED
-//#define HAL_RCC_MODULE_ENABLED
+#define HAL_RCC_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
 //#define HAL_PWR_MODULE_ENABLED
-//#define HAL_CORTEX_MODULE_ENABLED
+#define HAL_CORTEX_MODULE_ENABLED
 
 /* ########################## Oscillator Values adaptation ####################*/
 /**

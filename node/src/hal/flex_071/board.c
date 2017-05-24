@@ -15,17 +15,38 @@ static bool McuInitialized = false;
 Adc_t Adc;
 I2c_t I2c;
 Gpio_t Led;
-
+Uart_t Uart1;
 static void BoardUnusedIoInit( void );
+#define UART_FIFO_TX_SIZE                                8
+#define UART_FIFO_RX_SIZE                                256
+uint8_t buff[16];
 
+uint8_t UartTxBuffer[UART_FIFO_TX_SIZE];
+uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
 #define HSI_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define PLL_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)0x1FFFF)  /* 5 s    */
+static uint8_t IrqNestLevel = 0;
 
+void BoardDisableIrq( void )
+{
+    __disable_irq( );
+    IrqNestLevel++;
+}
+
+void BoardEnableIrq( void )
+{
+    IrqNestLevel--;
+    if( IrqNestLevel == 0 )
+    {
+        __enable_irq( );
+    }
+}
 void SystemClock_Config(void)
 {
     uint32_t tickstart;
-
+    RCC_PeriphCLKInitTypeDef PeriphClkInit;
+    
     RCC->APB1ENR |= (RCC_APB1ENR_PWREN);
     while(PWR->CSR & PWR_CSR_VOSF);
     PWR->CR = (PWR->CR & ~(PWR_CR_VOS)) | PWR_CR_VOS_0;
@@ -59,6 +80,10 @@ void SystemClock_Config(void)
             while(1);
         }
     }
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_I2C1;
+    PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+    PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+    HAL_RCCEx_PeriphCLKConfig( &PeriphClkInit );
 }
 
 void BoardInitPeriph( void )
@@ -92,6 +117,13 @@ void BoardInitMcu( void )
         
         McuInitialized = true;
     }
+    
+    FifoInit( &Uart1.FifoTx, UartTxBuffer, UART_FIFO_TX_SIZE );
+    FifoInit( &Uart1.FifoRx, UartRxBuffer, UART_FIFO_RX_SIZE );
+    UartInit( &Uart1, UART_2, UART_TX, UART_RX );
+    UartConfig( &Uart1, RX_TX, 9600, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL );
+
+    
 #ifdef MCP9800
     I2cInit( &I2c, I2C_SCL, I2C_SDA );
 #endif
@@ -114,7 +146,8 @@ void BoardDeInitMcu( void )
     Flash_If_DeInit();
     SpiDeInit( &SX1276.Spi );
     SX1276IoDeInit( );
-
+    UartDeInit( &Uart1 );
+    
     McuInitialized = false;
 
 #ifndef USE_DEBUGGER
@@ -152,4 +185,20 @@ uint8_t BoardMeasureBatterieLevel( void )
 static void BoardUnusedIoInit( void )
 {
 
+}
+
+void GetDevID(void)
+{
+  uint16_t size = 0;
+  while(1)
+    {
+      UartPutBuffer(&Uart1, "11", 2);
+      if(0 == UartGetBuffer(&Uart1, buff, 16, &size))
+      {
+          UartPutBuffer(&Uart1, "ok", 2);
+      }
+      DelayMs( 500 );
+      
+    }
+  
 }

@@ -310,10 +310,12 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
   - SCEN, HDSEL and IREN  bits in the USART_CR3 register.*/
   huart->Instance->CR2 &= ~(USART_CR2_LINEN | USART_CR2_CLKEN); 
   huart->Instance->CR3 &= ~(USART_CR3_SCEN | USART_CR3_HDSEL | USART_CR3_IREN); 
-    
+  
+
+  
   /* Enable the Peripheral */
   __HAL_UART_ENABLE(huart);
-  
+   __HAL_UART_CLEAR_IT(huart, 0xFFFFFFFF);   
   /* TEACK and/or REACK to check before moving huart->gState and huart->RxState to Ready */
   return (UART_CheckIdleState(huart));
 }
@@ -1135,7 +1137,7 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
     huart->gState = HAL_UART_STATE_READY;
     huart->RxState = HAL_UART_STATE_READY;
 
-    HAL_UART_ErrorCallback(huart);
+    //HAL_UART_ErrorCallback(huart);
   }
 
   /* UART Wake Up interrupt occured ------------------------------------------*/
@@ -1783,7 +1785,7 @@ void UART_SetConfig(UART_HandleTypeDef *huart)
     switch (clocksource)
     {
     case UART_CLOCKSOURCE_PCLK1: 
-      huart->Instance->BRR = (uint32_t)(UART_DIV_SAMPLING16(HAL_RCC_GetPCLK1Freq(), huart->Init.BaudRate));
+      huart->Instance->BRR = 0xd05;//(uint32_t)(UART_DIV_SAMPLING16(HAL_RCC_GetPCLK1Freq(), huart->Init.BaudRate));
       break;
     case UART_CLOCKSOURCE_PCLK2: 
       huart->Instance->BRR = (uint32_t)(UART_DIV_SAMPLING16(HAL_RCC_GetPCLK2Freq(), huart->Init.BaudRate));

@@ -10,7 +10,7 @@ Description: loramac-node board level functions
 
 */
 #include "board.h"
-
+#include "stm32l0xx_hal_uart.h"
 static bool McuInitialized = false;
 Adc_t Adc;
 I2c_t I2c;
@@ -27,7 +27,7 @@ uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
 #define PLL_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)0x1FFFF)  /* 5 s    */
 static uint8_t IrqNestLevel = 0;
-
+void McuIrqNotify( UartNotifyId_t id );
 void BoardDisableIrq( void )
 {
     __disable_irq( );
@@ -45,7 +45,7 @@ void BoardEnableIrq( void )
 void SystemClock_Config(void)
 {
     uint32_t tickstart;
-    RCC_PeriphCLKInitTypeDef PeriphClkInit;
+
     
     RCC->APB1ENR |= (RCC_APB1ENR_PWREN);
     while(PWR->CSR & PWR_CSR_VOSF);
@@ -81,10 +81,7 @@ void SystemClock_Config(void)
         }
     }
     
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_I2C1;
-    PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-    PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
-    HAL_RCCEx_PeriphCLKConfig( &PeriphClkInit );
+
 }
 
 void BoardInitPeriph( void )
@@ -123,7 +120,7 @@ void BoardInitMcu( void )
     FifoInit( &Uart1.FifoRx, UartRxBuffer, UART_FIFO_RX_SIZE );
     UartInit( &Uart1, UART_2, UART_TX, UART_RX );
     UartConfig( &Uart1, RX_TX, 9600, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL );
-
+   // Uart1.IrqNotify = McuIrqNotify;
     
 #ifdef MCP9800
     I2cInit( &I2c, I2C_SCL, I2C_SDA );
@@ -191,15 +188,34 @@ static void BoardUnusedIoInit( void )
 void GetDevID(void)
 {
   uint16_t size = 0;
-  while(1)
-    {
-      UartPutBuffer(&Uart1, "11", 2);
-      if(0 == UartGetBuffer(&Uart1, buff, 16, &size))
-      {
-          UartPutBuffer(&Uart1, "ok", 2);
-      }
-      DelayMs( 500 );
-      
-    }
+
+  UartPutBuffer(&Uart1, "11", 2);
+
   
+}
+uint8_t NmeaString[128];
+uint8_t NmeaStringSize = 0;
+void McuIrqNotify( UartNotifyId_t id )
+{
+    uint8_t data;
+    if( id == UART_NOTIFY_RX )
+    {
+        if( UartGetChar( &Uart1, &data ) == 0 )
+        {
+            if( ( data == '$' ) || ( NmeaStringSize >= 127 ) )
+            {
+                NmeaStringSize = 0;
+            }
+
+            NmeaString[NmeaStringSize++] = ( int8_t )data;
+
+            if( data == '\n' )
+            {
+                NmeaString[NmeaStringSize++] = '\0';
+                //GpsParseGpsData( ( int8_t* )NmeaString, NmeaStringSize );
+                UartDeInit( &Uart1 );
+                //BlockLowPowerDuringTask ( false );
+            }
+        }
+    }
 }

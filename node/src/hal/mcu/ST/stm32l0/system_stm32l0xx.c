@@ -65,6 +65,7 @@
 
 #include "stm32l0xx.h"
 
+#include "stm32l0xx_hal_rcc_ex.h"
 #if !defined  (HSE_VALUE) 
   #define HSE_VALUE    ((uint32_t)8000000) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
@@ -221,6 +222,7 @@ void SystemInit (void)
   */
 void SystemCoreClockUpdate (void)
 {
+      RCC_PeriphCLKInitTypeDef PeriphClkInit;
   uint32_t tmp = 0, pllmul = 0, plldiv = 0, pllsource = 0, msirange = 0, hsidiv = 0;
 
   /* Get SYSCLK source -------------------------------------------------------*/
@@ -273,6 +275,11 @@ void SystemCoreClockUpdate (void)
   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
   /* HCLK clock frequency */
   SystemCoreClock >>= tmp;
+  
+      PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_I2C1;
+    PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+    PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+    HAL_RCCEx_PeriphCLKConfig( &PeriphClkInit );
 }
 
 

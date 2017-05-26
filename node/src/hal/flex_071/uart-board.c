@@ -29,8 +29,8 @@ void UartMcuInit( Uart_t *obj, uint8_t uartId, PinNames tx, PinNames rx )
     __HAL_RCC_USART2_RELEASE_RESET( );
     __HAL_RCC_USART2_CLK_ENABLE( );
 
-    GpioInit( &obj->Tx, tx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_UP, GPIO_AF4_USART2 );
-    GpioInit( &obj->Rx, rx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_UP, GPIO_AF4_USART2 );
+    GpioInit( &obj->Tx, tx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_NO_PULL, GPIO_AF4_USART2 );
+    GpioInit( &obj->Rx, rx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_NO_PULL, GPIO_AF4_USART2 );
 }
 
 void UartMcuConfig( Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t wordLength, StopBits_t stopBits, Parity_t parity, FlowCtrl_t flowCtrl )
@@ -127,7 +127,7 @@ void UartMcuConfig( Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_
         assert_param( FAIL );
     }
 
-    HAL_NVIC_SetPriority( USART2_IRQn, 1, 0 );
+    HAL_NVIC_SetPriority( USART2_IRQn, 8, 0 );
     HAL_NVIC_EnableIRQ( USART2_IRQn );
 
     /* Enable the UART Data Register not empty Interrupt */
@@ -143,9 +143,11 @@ void UartMcuDeInit( Uart_t *obj )
     GpioInit( &obj->Tx, obj->Tx.pin, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
     GpioInit( &obj->Rx, obj->Rx.pin, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
 }
-
+extern HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
 uint8_t UartMcuPutChar( Uart_t *obj, uint8_t data )
 {
+   HAL_UART_Transmit(&UartHandle, "11", 2, 5);
+#if 0
     BoardDisableIrq( );
     TxData = data;
 
@@ -160,6 +162,7 @@ uint8_t UartMcuPutChar( Uart_t *obj, uint8_t data )
         return 0; // OK
     }
     BoardEnableIrq( );
+#endif
     return 1; // Busy
 }
 
@@ -217,3 +220,4 @@ void USART2_IRQHandler( void )
 {
     HAL_UART_IRQHandler( &UartHandle );
 }
+

@@ -18,7 +18,7 @@
         <stlinkResetStrategy>3</stlinkResetStrategy>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>27922283</Checksum>
+        <Checksum>890404344</Checksum>
     </DebugChecksum>
     <JLinkDriver>
         <CStepIntDis>_ 0</CStepIntDis>
@@ -64,14 +64,45 @@
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
     <DisassembleMode>
-        <mode>0</mode>
+        <mode>2</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.199.11" 0 0 1 "" 0 "" 0</Bp0>
-        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.196.7" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.84.5" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.124.5" 0 0 1 "" 0 "" 0</Bp3>
-        <Count>4</Count>
+        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.203.9" 0 0 1 "" 0 "" 0</Bp0>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.203.9" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.203.9" 0 0 1 "" 0 "" 0</Bp2>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.206.5" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.200.5" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.206.5" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.211.5" 0 0 1 "" 0 "" 0</Bp6>
+        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.211.5" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.221.5" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.223.1" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1170.5" 0 0 1 "" 0 "" 0</Bp10>
+        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1094.5" 0 0 1 "" 0 "" 0</Bp11>
+        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1105.5" 0 0 1 "" 0 "" 0</Bp12>
+        <Bp13>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1116.5" 0 0 1 "" 0 "" 0</Bp13>
+        <Bp14>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1127.5" 0 0 1 "" 0 "" 0</Bp14>
+        <Bp15>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1138.5" 0 0 1 "" 0 "" 0</Bp15>
+        <Bp16>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1150.5" 0 0 1 "" 0 "" 0</Bp16>
+        <Bp17>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1162.3" 0 0 1 "" 0 "" 0</Bp17>
+        <Bp18>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1168.2" 0 0 1 "" 0 "" 0</Bp18>
+        <Bp19>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1596.3" 0 0 1 "" 0 "" 0</Bp19>
+        <Bp20>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\flex_071\lwa\main.c}.69.5" 0 0 1 "" 0 "" 0</Bp20>
+        <Bp21>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.192.3" 0 0 1 "" 0 "" 0</Bp21>
+        <Bp22>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.189.9" 0 0 1 "" 0 "" 0</Bp22>
+        <Bp23>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c}.149.4" 0 0 1 "" 0 "" 0</Bp23>
+        <Bp24>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1710.3" 0 0 1 "" 0 "" 0</Bp24>
+        <Bp25>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.122.5" 0 0 1 "" 0 "" 0</Bp25>
+        <Bp26>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1715.3" 0 0 1 "" 0 "" 0</Bp26>
+        <Bp27>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.99.9" 0 0 1 "" 0 "" 0</Bp27>
+        <Bp28>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.98.9" 0 0 1 "" 0 "" 0</Bp28>
+        <Bp29>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\mcu\ST\stm32l0\system_stm32l0xx.c}.279.7" 0 0 1 "" 0 "" 0</Bp29>
+        <Bp30>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.317.3" 0 0 1 "" 0 "" 0</Bp30>
+        <Bp31>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.318.4" 0 0 1 "" 0 "" 0</Bp31>
+        <Bp32>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1945.7" 0 0 1 "" 0 "" 0</Bp32>
+        <Bp33>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1804.41" 0 0 1 "" 0 "" 0</Bp33>
+        <Bp34>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\stm32\src\stm32l0xx_hal_uart.c}.1788.7" 0 0 1 "" 0 "" 0</Bp34>
+        <Count>35</Count>
     </Breakpoints2>
     <Aliases>
         <A0>_ "E:\lora\lora-node\rhf76-052-lorawan-api-v0.3\src\lib\lorawan-node\src\radio\sx1276\sx1276.c" ""</A0>

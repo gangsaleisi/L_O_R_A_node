@@ -69,7 +69,11 @@ int main( void )
     BoardInitMcu( );
     BoardInitPeriph( );
     
-    GetDevID();
+    while(1){
+      GetDevID();
+      DelayMs( 5000 );
+    }
+   // GetDevID();
     
 #if 0
     app_lm_init(app_lm_cb);

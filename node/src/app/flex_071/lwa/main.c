@@ -71,9 +71,9 @@ int main( void )
     
     
     app_lm_init(app_lm_cb);
-
+#ifdef MODE_OTA
     app_lm_para_init();
-
+#endif
     /* Uncomment below line to enable class C mode */
     //LoRaMacSetDeviceClass(CLASS_C);
 

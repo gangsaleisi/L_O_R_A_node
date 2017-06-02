@@ -19,6 +19,11 @@ Description: Application LoRaWAN stack
 #define AESKEY_LEN                  (16)
 
 typedef enum{
+        ABP,
+        OTA,
+}LoRaMode_t;
+
+typedef enum{
 	IDLE,
 	BUSY,
 	DONE,
@@ -62,9 +67,13 @@ typedef enum{
 typedef void (*lm_callback_t) (lm_evt_t lm_evt, void *msg);
 
 void app_lm_init(lm_callback_t cb);
+void app_lm_para_init(void);
+uint8_t app_lm_join(void);
 int app_lm_send( LoRaFrameType_t type, uint8_t *buf, int size, int retry);
-
+uint8_t app_lm_join(void);
 uint32_t app_lm_get_devaddr(void);
+uint8_t app_lm_get_mode(void);
+void app_lm_set_mode(LoRaMode_t mode);
 
 int LoRaMacSetKey(LoRaMacKey_t key_type, uint8_t *key);
 int LoRaMacGetKey(LoRaMacKey_t key_type, uint8_t *key);

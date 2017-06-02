@@ -19,6 +19,7 @@
 *.iex
 *.lnp
 *.lst
+*.dnx
 *.map
 *.o
 *.orig

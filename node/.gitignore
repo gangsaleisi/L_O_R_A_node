@@ -10,6 +10,7 @@
 *.dbgdt
 *.dep
 *.dni
+*.dnx
 *.elf
 *.elf.xcodeproj
 *.ewt
@@ -19,7 +20,6 @@
 *.iex
 *.lnp
 *.lst
-*.dnx
 *.map
 *.o
 *.orig

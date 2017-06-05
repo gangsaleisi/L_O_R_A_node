@@ -25,6 +25,7 @@ Description: loramac-node board dependent definitions
 #include "delay.h"
 #include "gpio.h"
 #include "adc.h"
+#include "uart.h"
 #include "spi.h"
 #include "i2c.h"
 #include "flash.h"
@@ -33,7 +34,7 @@ Description: loramac-node board dependent definitions
 #include "rtc-board.h"
 #include "timer-board.h"
 #include "sx1276-board.h"
-
+#include "uart-board.h"
 /*!
  * NULL definition
  */
@@ -102,6 +103,8 @@ Description: loramac-node board dependent definitions
 
 #define I2C_SCL                                     PB_6
 #define I2C_SDA                                     PB_7
+#define UART_TX                                     PA_2
+#define UART_RX                                     PA_3
 
 #define RADIO_MOSI                                  PA_7
 #define RADIO_MISO                                  PA_6
@@ -112,6 +115,8 @@ Description: loramac-node board dependent definitions
 #define SWCLK                                       PA_14
 
 #define LED                                         PA_0
+
+extern Uart_t Uart1;
 /*!
  * \brief Initializes the target board peripherals.
  */
@@ -121,7 +126,10 @@ void BoardInitMcu( void );
  * \brief Initializes the boards peripherals.
  */
 void BoardInitPeriph( void );
-
+/*!
+ * \brief Initializes the boards paremeter.
+ */
+void BoardInitParameter( void );
 /*!
  * \brief De-initializes the target board peripherals to decrease power
  *        consumption.
@@ -141,12 +149,32 @@ uint8_t BoardMeasureBatterieLevel( void );
  * \param [IN] id Pointer to an array that will contain the Unique ID
  */
 void BoardGetUniqueId( uint8_t *id );
-
+/*!
+ * \brief Gets sensor temperature
+ */
 float get_sensor_value( void );
+/*!
+ * \brief Initializes flash
+ */
 extern uint16_t Flash_If_Init(void);
+/*!
+ * \brief erase flash
+ */
 extern uint16_t Flash_If_Erase(uint32_t Add);
+/*!
+ * \brief erase page flash
+ */
 extern uint16_t Flash_If_Erase_Page(uint32_t Add);
+/*!
+ * \brief write flash
+ */
 extern uint16_t Flash_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len);
+/*!
+ * \brief read flash
+ */
 extern uint8_t *Flash_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len);
+/*!
+ * \brief De-initializes flash
+ */
 extern uint16_t Flash_If_DeInit(void);
 #endif // __BOARD_H__

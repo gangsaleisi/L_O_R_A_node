@@ -2014,6 +2014,8 @@ typedef struct
 #define RCC_CIFR_LSECSSF                    ((uint32_t)0x00000080)        /*!< LSE Clock Security System Interrupt flag */
 #define RCC_CIFR_CSSF                       ((uint32_t)0x00000100)        /*!< Clock Security System Interrupt flag */
 
+#define RCC_CIFR_CSSLSEF  RCC_CIFR_LSECSSF                   
+#define RCC_CIFR_CSSHSEF  RCC_CIFR_CSSF 
 /*!<******************  Bit definition for RCC_CICR register  ********************/
 #define RCC_CICR_LSIRDYC                    ((uint32_t)0x00000001)        /*!< LSI Ready Interrupt Clear */
 #define RCC_CICR_LSERDYC                    ((uint32_t)0x00000002)        /*!< LSE Ready Interrupt Clear */
@@ -3219,6 +3221,9 @@ typedef struct
 #define USART_CR1_RTOIE                     ((uint32_t)0x04000000)            /*!< Receive Time Out interrupt enable */
 #define USART_CR1_EOBIE                     ((uint32_t)0x08000000)            /*!< End of Block interrupt enable */
 #define USART_CR1_M_1                       ((uint32_t)0x10000000)            /*!< Word length - Bit 1 */
+
+#define USART_CR1_M0  USART_CR1_M_0 
+#define USART_CR1_M1   USART_CR1_M_1
 /******************  Bit definition for USART_CR2 register  *******************/
 #define USART_CR2_ADDM7                     ((uint32_t)0x00000010)            /*!< 7-bit or 4-bit Address Detection */
 #define USART_CR2_LBDL                      ((uint32_t)0x00000020)            /*!< LIN Break Detection Length */

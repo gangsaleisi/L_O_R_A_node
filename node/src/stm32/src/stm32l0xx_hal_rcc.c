@@ -122,7 +122,8 @@
 #endif
 
 extern const uint8_t PLLMulTable[];          /* Defined in CMSIS (system_stm32l0xx.c)*/
-
+extern const uint8_t AHBPrescTable[] ;
+extern const uint8_t APBPrescTable[];
 /**
   * @}
   */ 

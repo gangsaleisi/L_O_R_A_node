@@ -15,12 +15,19 @@ static bool McuInitialized = false;
 Adc_t Adc;
 I2c_t I2c;
 Gpio_t Led;
+Uart_t Uart1;
 
 static void BoardUnusedIoInit( void );
 
 #define HSI_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define PLL_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)0x1FFFF)  /* 5 s    */
+
+#define UART_FIFO_TX_SIZE                                8
+#define UART_FIFO_RX_SIZE                                256
+
+uint8_t UartTxBuffer[UART_FIFO_TX_SIZE];
+uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
 
 void SystemClock_Config(void)
 {
@@ -88,7 +95,12 @@ void BoardInitMcu( void )
         RtcInit( );
 
         BoardUnusedIoInit( );
-       
+        FifoInit( &Uart1.FifoTx, UartTxBuffer, UART_FIFO_TX_SIZE );
+        FifoInit( &Uart1.FifoRx, UartRxBuffer, UART_FIFO_RX_SIZE );
+        // Configure your terminal for 8 Bits data (7 data bit + 1 parity bit), no parity and no flow ctrl
+        UartInit( &Uart1, UART_2, UART_TX, UART_RX );
+        UartConfig( &Uart1, RX_TX, 9600, UART_8_BIT, UART_1_STOP_BIT, NO_PARITY, NO_FLOW_CTRL );
+
         
         McuInitialized = true;
     }
@@ -114,7 +126,7 @@ void BoardDeInitMcu( void )
     Flash_If_DeInit();
     SpiDeInit( &SX1276.Spi );
     SX1276IoDeInit( );
-
+    //UartDeInit( &Uart1 );
     McuInitialized = false;
 
 #ifndef USE_DEBUGGER
@@ -152,4 +164,42 @@ uint8_t BoardMeasureBatterieLevel( void )
 static void BoardUnusedIoInit( void )
 {
 
+}
+static uint8_t IrqNestLevel = 0;
+
+void BoardDisableIrq( void )
+{
+    __disable_irq( );
+    IrqNestLevel++;
+}
+
+void BoardEnableIrq( void )
+{
+    IrqNestLevel--;
+    if( IrqNestLevel == 0 )
+    {
+        __enable_irq( );
+    }
+}
+uint8_t aRxBuffer[15];
+
+void GetDevEui(void)
+{
+  uint16_t size = 0;
+  while(1)
+  {
+	if(UartGetBuffer(&Uart1, aRxBuffer, 15, &size) == 0)
+        {
+            if(strncmp(aRxBuffer, "FLEX11110000"/*FLASH_HEAD*/, 12) == 0)
+            {
+                my_printf("OK!");
+                break;
+            }
+            else
+            {
+                my_printf("ERROR!");
+            }
+        }
+        DelayMs(5);
+  } 
 }

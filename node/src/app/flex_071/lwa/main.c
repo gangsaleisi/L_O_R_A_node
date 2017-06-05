@@ -18,7 +18,7 @@ Description: LoRaWAW Class A/C Example
 #define APP_PORT                                        (2)
 #define APP_DATA_SIZE                                   (8)
 
-#define APP_TX_DUTYCYCLE                                (90000000)     // min
+#define APP_TX_DUTYCYCLE                                (90000000)     // us
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
 
 
@@ -41,6 +41,7 @@ lm_evt_t loramac_evt;
 sys_sta_t sys_sta = SYS_STA_IDLE;
 
 uint8_t AppData[APP_DATA_SIZE];
+extern void my_printf(uint8_t *buff);
 
 void OnReportTimerEvent( void )
 {
@@ -68,12 +69,10 @@ int main( void )
 {
     BoardInitMcu( );
     BoardInitPeriph( );
-    
-    
-    app_lm_init(app_lm_cb);
-#ifdef MODE_OTA
+
     app_lm_para_init();
-#endif
+    app_lm_init(app_lm_cb);
+
     /* Uncomment below line to enable class C mode */
     //LoRaMacSetDeviceClass(CLASS_C);
 
@@ -96,6 +95,7 @@ int main( void )
             GpioWrite( &Led, 0 );
             if( loramac_join_flag == 0 && app_lm_get_mode() == OTA){
               app_lm_join();
+              my_printf("join\n");
               sys_sta = SYS_STA_WAIT;
             }
             else
@@ -104,7 +104,7 @@ int main( void )
               //jason
               //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
               if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-              sys_sta = SYS_STA_WAIT;
+                sys_sta = SYS_STA_WAIT;
               }else{
                   sys_sta = SYS_STA_IDLE;
                   ReportTimerEvent = false;

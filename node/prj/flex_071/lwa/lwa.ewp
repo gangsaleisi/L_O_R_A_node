@@ -211,7 +211,7 @@
                     <state>USE_DEBUGGER</state>
                     <state>LOW_POWER_MODE_ENABLE</state>
                     <state>USE_BAND_915_HYBRID</state>
-                    <state>MCP9700</state>
+                    <state>MCP9800</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

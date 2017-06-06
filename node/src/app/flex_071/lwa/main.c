@@ -95,7 +95,7 @@ int main( void )
             GpioWrite( &Led, 0 );
             if( loramac_join_flag == 0 && app_lm_get_mode() == OTA){
               app_lm_join();
-              my_printf("join\n");
+              //my_printf("join\n");
               sys_sta = SYS_STA_WAIT;
             }
             else

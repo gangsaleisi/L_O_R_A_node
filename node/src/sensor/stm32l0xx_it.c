@@ -33,7 +33,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l0xx_hal.h"
 #include "stm32l0xx.h"
-//#include "stm32l0xx_it.h"
+#include "board.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -41,67 +41,13 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_usart2_rx;
+extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart2;
-
+extern USART_RECEIVETYPE UsartType1; 
 /******************************************************************************/
 /*            Cortex-M0+ Processor Interruption and Exception Handlers         */ 
 /******************************************************************************/
-#if 0
-/**
-* @brief This function handles Non maskable Interrupt.
-*/
-//void NMI_Handler(void)
-{
-  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
-  /* USER CODE END NonMaskableInt_IRQn 0 */
-  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-
-  /* USER CODE END NonMaskableInt_IRQn 1 */
-}
-
-/**
-* @brief This function handles Hard fault interrupt.
-*/
-//void HardFault_Handler(void)
-{
-  /* USER CODE BEGIN HardFault_IRQn 0 */
-
-  /* USER CODE END HardFault_IRQn 0 */
-  while (1)
-  {
-  }
-  /* USER CODE BEGIN HardFault_IRQn 1 */
-
-  /* USER CODE END HardFault_IRQn 1 */
-}
-
-/**
-* @brief This function handles System service call via SWI instruction.
-*/
-//void SVC_Handler(void)
-{
-  /* USER CODE BEGIN SVC_IRQn 0 */
-
-  /* USER CODE END SVC_IRQn 0 */
-  /* USER CODE BEGIN SVC_IRQn 1 */
-
-  /* USER CODE END SVC_IRQn 1 */
-}
-
-/**
-* @brief This function handles Pendable request for system service.
-*/
-//void PendSV_Handler(void)
-{
-  /* USER CODE BEGIN PendSV_IRQn 0 */
-
-  /* USER CODE END PendSV_IRQn 0 */
-  /* USER CODE BEGIN PendSV_IRQn 1 */
-
-  /* USER CODE END PendSV_IRQn 1 */
-}
-#endif
 /**
 * @brief This function handles System tick timer.
 */
@@ -124,14 +70,12 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32l0xx.s).                    */
 /******************************************************************************/
 
-/**
-* @brief This function handles DMA1 channel 4, channel 5, channel 6 and channel 7 interrupts.
-*/
 void DMA1_Channel4_5_6_7_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel4_5_6_7_IRQn 0 */
 
   /* USER CODE END DMA1_Channel4_5_6_7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_tx);
   HAL_DMA_IRQHandler(&hdma_usart2_rx);
   /* USER CODE BEGIN DMA1_Channel4_5_6_7_IRQn 1 */
 
@@ -139,18 +83,38 @@ void DMA1_Channel4_5_6_7_IRQHandler(void)
 }
 
 /**
+* @brief This function handles DMA1 channel 4, channel 5, channel 6 and channel 7 interrupts.
+*/
+void usartReceive_IDLE(UART_HandleTypeDef *huart)
+{
+  uint32_t temp;
+  if((__HAL_UART_GET_FLAG(huart,UART_FLAG_IDLE) != RESET))  
+    {   
+        __HAL_UART_CLEAR_IDLEFLAG(&huart2);  
+        HAL_UART_DMAStop(&huart2);  
+        temp = huart2.hdmarx->Instance->CNDTR;  
+        UsartType1.rx_len =  RECEIVELEN - temp;   
+        if(UsartType1.rx_len > 0)
+        {
+          UsartType1.receive_flag=1; 
+        }
+        HAL_UART_Receive_DMA(&huart2,UsartType1.usartDMA_rxBuf,RECEIVELEN);  
+    }  
+}
+/**
 * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXTI line 26.
 */
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-
+  usartReceive_IDLE(&huart2);
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
 
   /* USER CODE END USART2_IRQn 1 */
 }
+
 
 /* USER CODE BEGIN 1 */
 

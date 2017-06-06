@@ -2145,9 +2145,6 @@
             <name>$PROJ_DIR$\..\..\..\src\sensor\adc.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\src\sensor\fifo.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\src\sensor\flash.c</name>
         </file>
         <file>
@@ -2164,9 +2161,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\src\sensor\stm32l0xx_it.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\src\sensor\uart.c</name>
         </file>
     </group>
     <group>

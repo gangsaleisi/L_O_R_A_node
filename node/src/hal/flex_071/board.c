@@ -15,7 +15,6 @@ static bool McuInitialized = false;
 Adc_t Adc;
 I2c_t I2c;
 Gpio_t Led;
-Uart_t Uart1;
 
 static void BoardUnusedIoInit( void );
 
@@ -28,9 +27,9 @@ static void BoardUnusedIoInit( void );
 
 uint8_t UartTxBuffer[UART_FIFO_TX_SIZE];
 uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_USART2_UART_Init(void);
+extern void MX_GPIO_Init(void);
+extern void MX_DMA_Init(void);
+extern void MX_USART2_UART_Init(void);
 void SystemClock_Config(void)
 {
     uint32_t tickstart;
@@ -85,7 +84,7 @@ void BoardInitMcu( void )
         SystemCoreClockUpdate();
         
         GpioInit( &Led, LED, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
-        
+        GpioWrite( &Led, 0 );
         // Disable Systick
         SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk;    // Systick IRQ off
         SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;            // Clear SysTick Exception pending flag
@@ -183,101 +182,36 @@ void BoardEnableIrq( void )
         __enable_irq( );
     }
 }
-uint8_t rx_buffer[21] = {0};
-uint8_t tx_buffer[21] = {0};
-uint8_t receive_flag = 0;
-#define BUFF_SIXE       20
+
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
-void _Error_Handler(char * file, int line);
+DMA_HandleTypeDef hdma_usart2_tx;
+USART_RECEIVETYPE UsartType1; 
+
 void GetDevEui(void)
 {
-  uint16_t size = 0;
-    MX_GPIO_Init();
+  MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
-  HAL_UART_Receive_DMA(&huart2, rx_buffer, BUFF_SIXE);
+  HAL_UART_Receive_DMA(&huart2, UsartType1.usartDMA_rxBuf, RECEIVELEN);  
+  __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
   while(1)
   {
-#if 1
-    if(receive_flag == 1)
+
+    if(UsartType1.receive_flag)//如果产生了空闲中断  
     {
-            if(strncmp(tx_buffer, "FLEX11110000"/*FLASH_HEAD*/, 12) == 0)
-            {
-              memset(rx_buffer, 0, sizeof(rx_buffer));
-              my_printf("OK!");
-                
-              //break;
-            }
-            else
-            {
-              memset(rx_buffer, 0, sizeof(rx_buffer));
-              my_printf("ERROR!");
-            }
+      UsartType1.receive_flag=0;//清零标记  
+      if(strncmp(UsartType1.usartDMA_rxBuf, FLASH_HEAD, 4) == 0)
+      {
+        SendData("OK\n", 3);
+        
+        //break;
+      }
+      else
+      {
+        SendData("ERROR,add FLEX before ID\n", 25);
+      }
     }
-#endif
+
   }
-}
-static void MX_USART2_UART_Init(void)
-{
-
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-  //__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
-}
-
-/** 
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void) 
-{
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Channel4_5_6_7_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_5_6_7_IRQn, 1, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel4_5_6_7_IRQn);
-
-}
-
-/** Pinout Configuration
-*/
-static void MX_GPIO_Init(void)
-{
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-
-}
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
-void _Error_Handler(char * file, int line)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  while(1) 
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */ 
 }

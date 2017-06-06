@@ -15,95 +15,92 @@ Maintainer: Miguel Luis and Gregory Cristian
 */
 #include "board.h"
 
-#include "uart-board.h"
-
-UART_HandleTypeDef UartHandle;
 
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern UART_HandleTypeDef huart2;
-void UartMcuDeInit( Uart_t *obj )
+extern USART_RECEIVETYPE UsartType1; 
+extern void _Error_Handler(char * file, int line);
+void MX_USART2_UART_Init(void)
 {
-    __HAL_RCC_USART2_FORCE_RESET( );
-    __HAL_RCC_USART2_RELEASE_RESET( );
-    __HAL_RCC_USART2_CLK_DISABLE( );
 
-    GpioInit( &obj->Tx, obj->Tx.pin, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-    GpioInit( &obj->Rx, obj->Rx.pin, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 9600;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 }
 
-uint8_t UartMcuPutChar( Uart_t *obj, uint8_t data )
+/** 
+  * Enable DMA controller clock
+  */
+void MX_DMA_Init(void) 
 {
-	HAL_UART_Transmit(&UartHandle, "11", 2, 5);
-	#if 0
-    BoardDisableIrq( );
-    TxData = data;
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
 
-    if( IsFifoFull( &obj->FifoTx ) == false )
-    {
-        FifoPush( &obj->FifoTx, TxData );
+  /* DMA interrupt init */
+  /* DMA1_Channel4_5_6_7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_5_6_7_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_5_6_7_IRQn);
 
-        // Trig UART Tx interrupt to start sending the FIFO contents.
-        __HAL_UART_ENABLE_IT( &UartHandle, UART_IT_TC );
-
-        BoardEnableIrq( );
-        return 0; // OK
-    }
-    BoardEnableIrq( );
-		#endif
-    return 1; // Busy
 }
 
-extern uint8_t rx_buffer[21];
-extern uint8_t tx_buffer[21];
-#define BUFF_SIXE_1       20
-void my_printf(uint8_t *buff)
+/** Pinout Configuration
+*/
+void MX_GPIO_Init(void)
 {
-  HAL_UART_Transmit(&UartHandle, buff, strlen((char const *)buff), 5);
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
 }
 
-void HAL_UART_TxCpltCallback( UART_HandleTypeDef *handle )
-{
-#if 0
-    if( IsFifoEmpty( &Uart1.FifoTx ) == false )
-    {
-        TxData = FifoPop( &Uart1.FifoTx );
-        //  Write one byte to the transmit data register
-        HAL_UART_Transmit_IT( &UartHandle, &TxData, 1 );
-    }
+/* USER CODE BEGIN 4 */
 
-    if( Uart1.IrqNotify != NULL )
-    {
-        Uart1.IrqNotify( UART_NOTIFY_TX );
-    }
-#endif
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @param  None
+  * @retval None
+  */
+void _Error_Handler(char * file, int line)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  while(1) 
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */ 
 }
-extern uint8_t receive_flag;
+
 void HAL_UART_RxCpltCallback( UART_HandleTypeDef *handle )
 {
-#if 0
-    if( IsFifoFull( &Uart1.FifoRx ) == false )
-    {
-        // Read one byte from the receive data register
-        FifoPush( &Uart1.FifoRx, RxData );
-    }
 
-    if( Uart1.IrqNotify != NULL )
-    {
-        Uart1.IrqNotify( UART_NOTIFY_RX );
-    }
-#endif
-    receive_flag = 1;
-    memcpy1(tx_buffer, rx_buffer, sizeof(rx_buffer));
-    HAL_UART_Receive_DMA( &huart2, rx_buffer, BUFF_SIXE_1 );
 }
 
+//DMA发送完成中断回调函数  
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)  
+{  
+     __HAL_DMA_DISABLE(huart->hdmatx);  
+    UsartType1.dmaSend_flag = USART_DMA_SENDOVER;  
+}  
 void HAL_UART_ErrorCallback( UART_HandleTypeDef *handle )
 {
-   // HAL_UART_Receive_IT( &UartHandle, &RxData, 1 );
+
 }
-#if 0
-void USART2_IRQHandler( void )
-{
-    HAL_UART_IRQHandler( &UartHandle );
-}
-#endif
+void SendData(uint8_t *pdata, uint16_t Length)  
+{  
+    while(UsartType1.dmaSend_flag == USART_DMA_SENDING);  
+    UsartType1.dmaSend_flag = USART_DMA_SENDING;  
+    HAL_UART_Transmit_DMA(&huart2, pdata, Length);  
+}  

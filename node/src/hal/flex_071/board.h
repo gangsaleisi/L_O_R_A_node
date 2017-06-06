@@ -25,7 +25,6 @@ Description: loramac-node board dependent definitions
 #include "delay.h"
 #include "gpio.h"
 #include "adc.h"
-#include "uart.h"
 #include "spi.h"
 #include "i2c.h"
 #include "flash.h"
@@ -34,7 +33,6 @@ Description: loramac-node board dependent definitions
 #include "rtc-board.h"
 #include "timer-board.h"
 #include "sx1276-board.h"
-#include "uart-board.h"
 /*!
  * NULL definition
  */
@@ -116,7 +114,18 @@ Description: loramac-node board dependent definitions
 
 #define LED                                         PA_0
 
-extern Uart_t Uart1;
+
+#define RECEIVELEN 128 
+#define USART_DMA_SENDING 1//发送未完成  
+#define USART_DMA_SENDOVER 0//发送完成  
+typedef struct  
+{  
+uint8_t receive_flag:1;//空闲接收标记  
+uint8_t dmaSend_flag:1;//发送完成标记  
+uint16_t rx_len;//接收长度  
+uint8_t usartDMA_rxBuf[RECEIVELEN];//DMA接收缓存  
+}USART_RECEIVETYPE; 
+
 /*!
  * \brief Initializes the target board peripherals.
  */

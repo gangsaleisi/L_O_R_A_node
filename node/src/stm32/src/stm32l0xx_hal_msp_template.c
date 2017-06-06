@@ -74,11 +74,12 @@
   * @param  None
   * @retval None
   */
+#if 0
 void HAL_MspInit(void)
 {
   /* NOTE : This function is eventually modified by the user */ 
 }
-
+#endif
 /**
   * @brief  DeInitializes the Global MSP.
   * @param  None  

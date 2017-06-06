@@ -18,124 +18,9 @@ Maintainer: Miguel Luis and Gregory Cristian
 #include "uart-board.h"
 
 UART_HandleTypeDef UartHandle;
-uint8_t RxData = 0;
-uint8_t TxData = 0;
-extern void BoardEnableIrq( void );
-extern void BoardDisableIrq( void );
 
-void UartMcuInit( Uart_t *obj, uint8_t uartId, PinNames tx, PinNames rx )
-{
-    obj->UartId = uartId;
-
-    __HAL_RCC_USART2_FORCE_RESET( );
-    __HAL_RCC_USART2_RELEASE_RESET( );
-    __HAL_RCC_USART2_CLK_ENABLE( );
-
-    GpioInit( &obj->Tx, tx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_UP, GPIO_AF4_USART2 );
-    GpioInit( &obj->Rx, rx, PIN_ALTERNATE_FCT, PIN_PUSH_PULL, PIN_PULL_UP, GPIO_AF4_USART2 );
-}
-
-void UartMcuConfig( Uart_t *obj, UartMode_t mode, uint32_t baudrate, WordLength_t wordLength, StopBits_t stopBits, Parity_t parity, FlowCtrl_t flowCtrl )
-{
-    UartHandle.Instance = USART2;
-    UartHandle.Init.BaudRate = baudrate;
-
-    if( mode == TX_ONLY )
-    {
-        if( obj->FifoTx.Data == NULL )
-        {
-            //assert_param( FAIL );
-        }
-        UartHandle.Init.Mode = UART_MODE_TX;
-    }
-    else if( mode == RX_ONLY )
-    {
-        if( obj->FifoRx.Data == NULL )
-        {
-            //assert_param( FAIL );
-        }
-        UartHandle.Init.Mode = UART_MODE_RX;
-    }
-    else if( mode == RX_TX )
-    {
-        if( ( obj->FifoTx.Data == NULL ) || ( obj->FifoRx.Data == NULL ) )
-        {
-           // assert_param( FAIL );
-        }
-        UartHandle.Init.Mode = UART_MODE_TX_RX;
-    }
-    else
-    {
-      // assert_param( FAIL );
-    }
-
-    if( wordLength == UART_8_BIT )
-    {
-        UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-    }
-    else if( wordLength == UART_9_BIT )
-    {
-        UartHandle.Init.WordLength = UART_WORDLENGTH_9B;
-    }
-
-    switch( stopBits )
-    {
-    case UART_2_STOP_BIT:
-        UartHandle.Init.StopBits = UART_STOPBITS_2;
-        break;
-    case UART_1_5_STOP_BIT:
-        UartHandle.Init.StopBits = UART_STOPBITS_1_5;
-        break;
-    case UART_1_STOP_BIT:
-    default:
-        UartHandle.Init.StopBits = UART_STOPBITS_1;
-        break;
-    }
-
-    if( parity == NO_PARITY )
-    {
-        UartHandle.Init.Parity = UART_PARITY_NONE;
-    }
-    else if( parity == EVEN_PARITY )
-    {
-        UartHandle.Init.Parity = UART_PARITY_EVEN;
-    }
-    else
-    {
-        UartHandle.Init.Parity = UART_PARITY_ODD;
-    }
-
-    if( flowCtrl == NO_FLOW_CTRL )
-    {
-        UartHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-    }
-    else if( flowCtrl == RTS_FLOW_CTRL )
-    {
-        UartHandle.Init.HwFlowCtl = UART_HWCONTROL_RTS;
-    }
-    else if( flowCtrl == CTS_FLOW_CTRL )
-    {
-        UartHandle.Init.HwFlowCtl = UART_HWCONTROL_CTS;
-    }
-    else if( flowCtrl == RTS_CTS_FLOW_CTRL )
-    {
-        UartHandle.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
-    }
-
-    UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-
-    if( HAL_UART_Init( &UartHandle ) != HAL_OK )
-    {
-       // assert_param( FAIL );
-    }
-
-   HAL_NVIC_SetPriority( USART2_IRQn, 1, 0 );
-   HAL_NVIC_EnableIRQ( USART2_IRQn );
-
-    /* Enable the UART Data Register not empty Interrupt */
-   HAL_UART_Receive_IT( &UartHandle, &RxData, 1 );
-}
-
+extern DMA_HandleTypeDef hdma_usart2_rx;
+extern UART_HandleTypeDef huart2;
 void UartMcuDeInit( Uart_t *obj )
 {
     __HAL_RCC_USART2_FORCE_RESET( );
@@ -168,19 +53,9 @@ uint8_t UartMcuPutChar( Uart_t *obj, uint8_t data )
     return 1; // Busy
 }
 
-uint8_t UartMcuGetChar( Uart_t *obj, uint8_t *data )
-{
-    BoardDisableIrq( );
-
-    if( IsFifoEmpty( &obj->FifoRx ) == false )
-    {
-        *data = FifoPop( &obj->FifoRx );
-        BoardEnableIrq( );
-        return 0;
-    }
-    BoardEnableIrq( );
-    return 1;
-}
+extern uint8_t rx_buffer[21];
+extern uint8_t tx_buffer[21];
+#define BUFF_SIXE_1       20
 void my_printf(uint8_t *buff)
 {
   HAL_UART_Transmit(&UartHandle, buff, strlen((char const *)buff), 5);
@@ -202,9 +77,10 @@ void HAL_UART_TxCpltCallback( UART_HandleTypeDef *handle )
     }
 #endif
 }
-
+extern uint8_t receive_flag;
 void HAL_UART_RxCpltCallback( UART_HandleTypeDef *handle )
 {
+#if 0
     if( IsFifoFull( &Uart1.FifoRx ) == false )
     {
         // Read one byte from the receive data register
@@ -215,16 +91,19 @@ void HAL_UART_RxCpltCallback( UART_HandleTypeDef *handle )
     {
         Uart1.IrqNotify( UART_NOTIFY_RX );
     }
-
-    HAL_UART_Receive_IT( &UartHandle, &RxData, 1 );
+#endif
+    receive_flag = 1;
+    memcpy1(tx_buffer, rx_buffer, sizeof(rx_buffer));
+    HAL_UART_Receive_DMA( &huart2, rx_buffer, BUFF_SIXE_1 );
 }
 
 void HAL_UART_ErrorCallback( UART_HandleTypeDef *handle )
 {
-    HAL_UART_Receive_IT( &UartHandle, &RxData, 1 );
+   // HAL_UART_Receive_IT( &UartHandle, &RxData, 1 );
 }
-
+#if 0
 void USART2_IRQHandler( void )
 {
     HAL_UART_IRQHandler( &UartHandle );
 }
+#endif

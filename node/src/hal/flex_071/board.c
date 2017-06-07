@@ -187,7 +187,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 USART_RECEIVETYPE UsartType1; 
-
+uint16_t eui[4] = {0};
 void GetDevEui(void)
 {
   MX_GPIO_Init();
@@ -203,6 +203,14 @@ void GetDevEui(void)
       UsartType1.receive_flag=0;//«Â¡„±Íº«  
       if(strncmp(UsartType1.usartDMA_rxBuf, FLASH_HEAD, 4) == 0)
       {
+        eui[0] = ( uint16_t )UsartType1.usartDMA_rxBuf[5];
+        eui[0] |= ( uint16_t )UsartType1.usartDMA_rxBuf[4] << 8;
+        eui[1] = ( uint16_t )UsartType1.usartDMA_rxBuf[7];
+        eui[1] |= ( uint16_t )UsartType1.usartDMA_rxBuf[6] << 8;
+        eui[2] = ( uint16_t )UsartType1.usartDMA_rxBuf[9];
+        eui[2] |= ( uint16_t )UsartType1.usartDMA_rxBuf[8] << 8;
+        eui[3] = ( uint16_t )UsartType1.usartDMA_rxBuf[11];
+        eui[3] |= ( uint16_t )UsartType1.usartDMA_rxBuf[10] << 8;
         SendData("OK\n", 3);
         
         //break;

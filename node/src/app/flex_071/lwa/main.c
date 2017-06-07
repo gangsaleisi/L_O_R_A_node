@@ -69,7 +69,8 @@ int main( void )
     BoardInitMcu( );
     BoardInitPeriph( );
     
-    
+    get_sensor_value();
+#if 0
     app_lm_init(app_lm_cb);
 #ifdef MODE_OTA
     app_lm_para_init();
@@ -133,5 +134,6 @@ int main( void )
 
         TimerLowPowerHandler( );
     }
+#endif
 }
 

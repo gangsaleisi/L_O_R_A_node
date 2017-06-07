@@ -16,7 +16,7 @@ float get_sensor_value()
     uint16_t vout = Mcp97SensorAdc();
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
-#elif defined (MCP9800)
+#elif defined( TMP006 )
     vamb = Mcp98SensorI2c();
 
 #else
@@ -49,7 +49,7 @@ uint16_t Mcp97SensorAdc()
 
     return voltage;
 }
-#elif defined (MCP9800)
+#elif defined( TMP006 )
 extern I2c_t I2c;
 static uint8_t I2cDeviceAddr = 0;
 
@@ -107,11 +107,11 @@ float Mcp98SensorI2c( void )
 
     //Mcp98Check();
     
-    Mcp98ReadBuffer( TEMP_REG, tempBuf, 2 );
+    Mcp98ReadBuffer( MAUN_ID_REG, tempBuf, 2 );
 
     msb = tempBuf[0];
     lsb = tempBuf[1];
-
+#if 0
     if( msb > 0x7F )
     {
         val = ~( ( msb << 8 ) + lsb ) + 1;      // 2¡¯s complement
@@ -128,7 +128,7 @@ float Mcp98SensorI2c( void )
     {
         temperature = msb + ( float )( ( lsb >> 4 ) / 16.0 );
     }
-
+#endif
 
     return( temperature );
 }

@@ -15,6 +15,7 @@ static bool McuInitialized = false;
 Adc_t Adc;
 I2c_t I2c;
 Gpio_t Led;
+Gpio_t UnUsed;
 
 static void BoardUnusedIoInit( void );
 
@@ -151,5 +152,17 @@ uint8_t BoardMeasureBatterieLevel( void )
 
 static void BoardUnusedIoInit( void )
 {
-
+    GpioInit( &UnUsed, UNUSED_1, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_2, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_3, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_4, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_5, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_6, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_7, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_8, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_9, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_10, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_11, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_12, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_13, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
 }

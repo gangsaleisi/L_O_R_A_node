@@ -79,7 +79,7 @@ int main( void )
 
     TimerInit( &ReportTimer, OnReportTimerEvent );
     ReportTimerEvent = true;
-    
+    DelayMs( 10000 );
     while( 1 )
     {
         switch(sys_sta){

@@ -13,6 +13,7 @@ License: Revised BSD License, see LICENSE.TXT file include in the project
 
 Maintainer: Miguel Luis and Gregory Cristian
 */
+#if 0
 #include "board.h"
 #include "i2c-board.h"
 
@@ -149,3 +150,4 @@ uint8_t I2cMcuWaitStandbyState( I2c_t *obj, uint8_t deviceAddr )
     status = ( HAL_I2C_IsDeviceReady( i2c, deviceAddr, 300, 4096 ) == HAL_OK ) ? SUCCESS : FAIL;;
     return status;
 }
+#endif

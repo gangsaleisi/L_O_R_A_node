@@ -10,11 +10,11 @@ Description: loramac-node board level functions
 
 */
 #include "board.h"
-
 static bool McuInitialized = false;
 Adc_t Adc;
-I2c_t I2c;
 Gpio_t Led;
+
+I2C_HandleTypeDef hi2c1;
 
 static void BoardUnusedIoInit( void );
 
@@ -22,7 +22,6 @@ static void BoardUnusedIoInit( void );
 #define PLL_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)0x1FFFF)  /* 5 s    */
 
-extern uint8_t Mcp98Init( void ); 
 void SystemClock_Config(void)
 {
     uint32_t tickstart;
@@ -64,9 +63,7 @@ void SystemClock_Config(void)
 
 void BoardInitPeriph( void )
 {
-#ifdef TMP006
-    Mcp98Init();
-#endif
+
 }
 
 void BoardInitMcu( void )
@@ -89,12 +86,13 @@ void BoardInitMcu( void )
         RtcInit( );
 
         BoardUnusedIoInit( );
-       
+
         
         McuInitialized = true;
     }
 #if defined( TMP006 )
-    I2cInit( &I2c, I2C_SCL, I2C_SDA );
+    MX_GPIO_Init();
+    MX_I2C1_Init();
 #endif
     AdcInit( &Adc, BAT_LEVEL_PIN );
     Flash_If_Init();
@@ -109,7 +107,7 @@ void BoardInitMcu( void )
 void BoardDeInitMcu( void )
 {
 #if defined( TMP006 )
-    I2cDeInit( &I2c );
+    MX_I2C1_DeInit();
 #endif
     AdcDeInit( &Adc );
     Flash_If_DeInit();
@@ -152,5 +150,12 @@ uint8_t BoardMeasureBatterieLevel( void )
 
 static void BoardUnusedIoInit( void )
 {
+
+}
+static void MX_GPIO_Init(void)
+{
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
 }

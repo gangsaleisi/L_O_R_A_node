@@ -25,6 +25,7 @@ typedef struct
     Gpio_t Sda;
 }I2c_t;
 
+void MX_I2C1_Init(void);
 /*!
  * \brief Initializes the I2C object and MCU peripheral
  *

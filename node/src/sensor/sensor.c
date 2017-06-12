@@ -1,6 +1,6 @@
 #include "board.h"
 #include "sensor.h"
-
+#include "math.h"  
 /*
 MCP9700A:
         Vout = Tc * Ta + V0
@@ -17,7 +17,7 @@ float get_sensor_value()
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
-    vamb = Mcp98SensorI2c();
+    vamb = Tmp006SensorI2c();
 
 #else
     //todo
@@ -50,87 +50,55 @@ uint16_t Mcp97SensorAdc()
     return voltage;
 }
 #elif defined( TMP006 )
-extern I2c_t I2c;
-static uint8_t I2cDeviceAddr = 0;
-
-uint8_t Mcp98Init( void )
+uint8_t tempBuf[3];
+float Tobj;
+float Tmp006SensorI2c( void )
 {
-    Mcp98SetDeviceAddr( MCP_I2C_ADDRESS );
+    uint16_t Tdie_Temp, Vobj_Read;
+    float Vobj;  
+    float Tdie;  
     
-    return SUCCESS;
-}
+    float S,Vos,fVobj;  
+    float S0 = 6.4*pow(10,-14);  
+    float a1 = 1.75*pow(10,-3);  
+    float a2 = -1.678*pow(10,-5);  
+    float Tref = 298.15;  
+    float b0 = -2.94*pow(10,-5);  
+    float b1 = -5.7*pow(10,-7);  
+    float b2 = 4.63*pow(10,-9);  
+    float c2 = 13.4; 
 
-uint8_t Mcp98Write( uint8_t addr, uint8_t data )
-{
-    return Mcp98WriteBuffer( addr, &data, 1 );
-}
-
-uint8_t Mcp98WriteBuffer( uint8_t addr, uint8_t *data, uint8_t size )
-{
-    return I2cWriteBuffer( &I2c, I2cDeviceAddr << 1, addr, data, size );
-}
-
-uint8_t Mcp98Read( uint8_t addr, uint8_t *data )
-{
-    return Mcp98ReadBuffer( addr, data, 1 );
-}
-
-uint8_t Mcp98ReadBuffer( uint8_t addr, uint8_t *data, uint8_t size )
-{
-    return I2cReadBuffer( &I2c, I2cDeviceAddr << 1, addr, data, size );
-}
-
-void Mcp98SetDeviceAddr( uint8_t addr )
-{
-    I2cDeviceAddr = addr;
-}
-
-uint8_t Mcp98GetDeviceAddr( void )
-{
-    return I2cDeviceAddr;
-}
-
-void Mcp98Check()
-{
-    uint8_t conReg = 0;
-    //Mcp98Write( CONF_REG, 0x02);
-    Mcp98Read( CONF_REG, &conReg );
-}
-
-float Mcp98SensorI2c( void )
-{
-    uint8_t tempBuf[2];
-    uint8_t msb = 0, lsb = 0;
-    bool negSign = false;
-    uint8_t val = 0;
-    float temperature = 0;
-
-    //Mcp98Check();
+    //read local temperature
+    Tmp006Read( TEMP_REG, tempBuf, 2 );
+    Tdie_Temp = ((tempBuf[0] << 8) +  tempBuf[1]);
+    if (Tdie_Temp >= 0x8000)  
+    {  
+       Tdie = -((Tdie_Temp>>2)|0xc000)*0.03125 + 273.15;  
+    }  
+    else  
+    {  
+       Tdie = (Tdie_Temp>>2)*0.03125 + 273.15;  
+    } 
+    //read sensor voltage
+    Tmp006Read( SENSOR_REG, tempBuf, 2 );
+    Vobj_Read  = (tempBuf[0] << 8) + tempBuf[1];
+    if(Vobj_Read >= 0x8000)  
+    {  
+        Vobj = -(0xffff - Vobj_Read + 1)*156.25;  
+    }
+    else  
+    {  
+        Vobj = Vobj_Read*156.25;   
+    }  
+    Vobj *= pow(10,-9);  
     
-    Mcp98ReadBuffer( MAUN_ID_REG, tempBuf, 2 );
-
-    msb = tempBuf[0];
-    lsb = tempBuf[1];
-#if 0
-    if( msb > 0x7F )
-    {
-        val = ~( ( msb << 8 ) + lsb ) + 1;      // 2¡¯s complement
-        msb = val >> 8;
-        lsb = val & 0x00F0;
-        negSign = true;
-    }
-
-    if( negSign == true )
-    {
-        temperature = 0 - ( msb + ( float )( ( lsb >> 4 ) / 16.0 ) );
-    }
-    else
-    {
-        temperature = msb + ( float )( ( lsb >> 4 ) / 16.0 );
-    }
-#endif
-
-    return( temperature );
+    S = S0*(1 + a1*(Tdie - Tref) + a2*(Tdie-Tref)*(Tdie - Tref));  
+    Vos = b0 + b1*(Tdie - Tref) + b2*(Tdie - Tref)*(Tdie - Tref);  
+    fVobj = Vobj - Vos + c2*(Vobj - Vos)*(Vobj - Vos);  
+    Tobj = sqrt(sqrt(pow(Tdie,4) + fVobj/S));  
+    Tobj -= 273.15;  
+            
+    return( Tobj );
 }
 
 #endif

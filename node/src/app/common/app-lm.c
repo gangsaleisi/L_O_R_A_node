@@ -16,7 +16,7 @@ Description: LoRaMac-Node application file
 
 lm_callback_t lm_callback_g;
 //jason
-#define LOAD_VALUE      0x24
+#define LOAD_VALUE      0x30
 static uint8_t DevEui[] = {
     0x46, 0x4c, 0x45, 0x58, 0x01, 0x01, 0x00, 0x00
 };
@@ -56,6 +56,7 @@ void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
     }
 
     if( flags->Bits.JoinAccept == 1 ){
+#ifdef MODE_OTA
         memset(FlashArray, 0x00, sizeof(FlashArray));
         DevAddr = LoRaMacGetDevAddr();
         memcpy(FlashArray, FLASH_HEAD, 4);
@@ -72,6 +73,7 @@ void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
         loramac_join_flag = 1;
         //memset(FlashArray, 0x00, sizeof(FlashArray));
         //Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 40);
+#endif
     }
 
     if( info->TxAckReceived == true ){

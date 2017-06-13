@@ -156,7 +156,11 @@ uint8_t BoardMeasureBatterieLevel( void );
  */
 void BoardGetUniqueId( uint8_t *id );
 
+void MX_GPIO_DeInit(void);
+void MX_I2C1_Init(void);
+void MX_I2C1_DeInit( void );
 float get_sensor_value( void );
+
 extern uint16_t Flash_If_Init(void);
 extern uint16_t Flash_If_Erase(uint32_t Add);
 extern uint16_t Flash_If_Erase_Page(uint32_t Add);

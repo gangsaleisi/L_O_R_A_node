@@ -71,15 +71,18 @@ int main( void )
     
     
     app_lm_init(app_lm_cb);
-
+#ifdef MODE_OTA
     app_lm_para_init();
-
+#endif
     /* Uncomment below line to enable class C mode */
-    //LoRaMacSetDeviceClass(CLASS_C);
-
+#ifdef CLASS_TYPE_C
+    LoRaMacSetDeviceClass(CLASS_C);
+#endif
     TimerInit( &ReportTimer, OnReportTimerEvent );
     ReportTimerEvent = true;
+#ifndef USE_DEBUGGER
     DelayMs( 10000 );
+#endif
     while( 1 )
     {
         switch(sys_sta){

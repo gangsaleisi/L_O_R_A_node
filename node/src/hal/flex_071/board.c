@@ -13,12 +13,14 @@ Description: loramac-node board level functions
 
 static bool McuInitialized = false;
 Adc_t Adc;
-I2c_t I2c;
 Gpio_t Led;
 Gpio_t UnUsed;
+I2C_HandleTypeDef hi2c1;
 
 static void BoardUnusedIoInit( void );
-
+#ifdef TMP006
+static void MX_GPIO_Init(void);
+#endif
 #define HSI_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define PLL_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)0x1FFFF)  /* 5 s    */
@@ -64,9 +66,7 @@ void SystemClock_Config(void)
 
 void BoardInitPeriph( void )
 {
-#ifdef MP9800
-    Mcp98Init();
-#endif
+
 }
 
 void BoardInitMcu( void )
@@ -93,8 +93,9 @@ void BoardInitMcu( void )
         
         McuInitialized = true;
     }
-#ifdef MCP9800
-    I2cInit( &I2c, I2C_SCL, I2C_SDA );
+#if defined( TMP006 )
+    MX_GPIO_Init();
+    MX_I2C1_Init();
 #endif
     AdcInit( &Adc, BAT_LEVEL_PIN );
     Flash_If_Init();
@@ -108,8 +109,8 @@ void BoardInitMcu( void )
 
 void BoardDeInitMcu( void )
 {
-#ifdef MCP9800
-    I2cDeInit( &I2c );
+#if defined( TMP006 )
+    MX_I2C1_DeInit();
 #endif
     AdcDeInit( &Adc );
     Flash_If_DeInit();
@@ -166,3 +167,12 @@ static void BoardUnusedIoInit( void )
     GpioInit( &UnUsed, UNUSED_12, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
     GpioInit( &UnUsed, UNUSED_13, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
 }
+#ifdef TMP006
+static void MX_GPIO_Init(void)
+{
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+}
+#endif

@@ -64,7 +64,7 @@
   */
 
 #include "stm32l0xx.h"
-
+#include "board.h"
 #if !defined  (HSE_VALUE) 
   #define HSE_VALUE    ((uint32_t)8000000) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
@@ -127,7 +127,7 @@
   uint32_t SystemCoreClock = 2000000;
 __IO const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 __IO const uint8_t PLLMulTable[9] = {3, 4, 6, 8, 12, 16, 24, 32, 48};
-
+__IO const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
 /**
   * @}
   */
@@ -221,7 +221,8 @@ void SystemInit (void)
 void SystemCoreClockUpdate (void)
 {
   uint32_t tmp = 0, pllmul = 0, plldiv = 0, pllsource = 0, msirange = 0, hsidiv = 0;
-
+ RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_PeriphCLKInitTypeDef PeriphClkInit;
   /* Get SYSCLK source -------------------------------------------------------*/
   tmp = RCC->CFGR & RCC_CFGR_SWS;
   
@@ -272,6 +273,28 @@ void SystemCoreClockUpdate (void)
   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
   /* HCLK clock frequency */
   SystemCoreClock >>= tmp;
+   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK;
+   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+   if( HAL_RCC_ClockConfig( &RCC_ClkInitStruct, FLASH_LATENCY_1 ) != HAL_OK )
+   {
+       assert_param( FAIL );
+   }
+   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_I2C1 | RCC_PERIPHCLK_RTC;
+   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+   if( HAL_RCCEx_PeriphCLKConfig( &PeriphClkInit ) != HAL_OK )
+   {
+       assert_param( FAIL );
+   }
+   HAL_SYSTICK_Config( HAL_RCC_GetHCLKFreq( ) / 1000 );
+   HAL_SYSTICK_CLKSourceConfig( SYSTICK_CLKSOURCE_HCLK );
+
+   // SysTick_IRQn interrupt configuration
+   HAL_NVIC_SetPriority( SysTick_IRQn, 0, 0 );
 }
 
 

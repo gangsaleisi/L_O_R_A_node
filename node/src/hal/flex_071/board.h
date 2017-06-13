@@ -144,6 +144,7 @@ void BoardGetUniqueId( uint8_t *id );
 
 void MX_GPIO_Init(void);
 void MX_GPIO_DeInit(void);
+void MX_I2C1_DeInit( void );
 
 float get_sensor_value( void );
 extern uint16_t Flash_If_Init(void);

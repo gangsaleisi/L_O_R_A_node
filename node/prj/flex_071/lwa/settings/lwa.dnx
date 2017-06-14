@@ -18,7 +18,7 @@
         <stlinkResetStrategy>3</stlinkResetStrategy>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>4025813897</Checksum>
+        <Checksum>4271711621</Checksum>
     </DebugChecksum>
     <JLinkDriver>
         <CStepIntDis>_ 0</CStepIntDis>
@@ -41,28 +41,6 @@
         <Enabled>0</Enabled>
         <ShowSource>1</ShowSource>
     </Trace1>
-    <LogFile>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-        <Category>_ 0</Category>
-    </LogFile>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
-    <DriverProfiling>
-        <Enabled>0</Enabled>
-        <Mode>1</Mode>
-        <Graph>0</Graph>
-        <Symbiont>0</Symbiont>
-        <Exclusions />
-    </DriverProfiling>
-    <CallStackLog>
-        <Enabled>0</Enabled>
-    </CallStackLog>
-    <CallStackStripe>
-        <ShowTiming>1</ShowTiming>
-    </CallStackStripe>
     <DisassembleMode>
         <mode>0</mode>
     </DisassembleMode>
@@ -76,11 +54,42 @@
         <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\flex_071\lwa\main.c}.70.5" 0 0 1 "" 0 "" 0</Bp6>
         <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.208.9" 0 0 1 "" 0 "" 0</Bp7>
         <Bp8>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.207.9" 0 0 1 "" 0 "" 0</Bp8>
-        <Count>9</Count>
+        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\hal\flex_071\board.c}.213.9" 0 0 1 "" 0 "" 0</Bp9>
+        <Bp10>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\common\app-lm.c}.165.9" 0 0 1 "" 0 "" 0</Bp10>
+        <Bp11>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\common\app-lm.c}.64.19" 0 0 1 "" 0 "" 0</Bp11>
+        <Bp12>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac-api-v3.c}.210.5" 0 0 1 "" 0 "" 0</Bp12>
+        <Bp13>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac.c}.914.13" 0 0 1 "" 0 "" 0</Bp13>
+        <Count>14</Count>
     </Breakpoints2>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </LogFile>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
     <Aliases>
         <A0>_ "E:\lora\lora-node\rhf76-052-lorawan-api-v0.3\src\lib\lorawan-node\src\radio\sx1276\sx1276.c" ""</A0>
         <Count>1</Count>
         <SuppressDialog>0</SuppressDialog>
     </Aliases>
+    <DriverProfiling>
+        <Enabled>0</Enabled>
+        <Mode>1</Mode>
+        <Graph>0</Graph>
+        <Symbiont>0</Symbiont>
+        <Exclusions />
+    </DriverProfiling>
+    <CallStackLog>
+        <Enabled>0</Enabled>
+    </CallStackLog>
+    <CallStackStripe>
+        <ShowTiming>1</ShowTiming>
+    </CallStackStripe>
 </settings>
+[JLinkDriver]
+TraceBufferSize=0x00010000
+TraceStallIfFIFOFull=0x00000000
+TracePortSize=0x00000000

@@ -206,7 +206,7 @@ void GetDevEui(void)
       {
         ComputeDevEui();
         SendData("OK\n", 3);
-        //break;
+        break;
       }
       else
       {

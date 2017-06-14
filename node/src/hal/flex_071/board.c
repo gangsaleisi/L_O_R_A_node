@@ -30,6 +30,7 @@ uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
 extern void MX_GPIO_Init(void);
 extern void MX_DMA_Init(void);
 extern void MX_USART2_UART_Init(void);
+extern void SendData(uint8_t *pdata, uint16_t Length);
 void SystemClock_Config(void)
 {
     uint32_t tickstart;
@@ -187,7 +188,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 USART_RECEIVETYPE UsartType1; 
-uint16_t eui[4] = {0};
+uint8_t uart_eui[4] = {0};
 void GetDevEui(void)
 {
   MX_GPIO_Init();
@@ -201,25 +202,48 @@ void GetDevEui(void)
     if(UsartType1.receive_flag)//如果产生了空闲中断  
     {
       UsartType1.receive_flag=0;//清零标记  
-      if(strncmp(UsartType1.usartDMA_rxBuf, FLASH_HEAD, 4) == 0)
+      if( (strncmp((char *)UsartType1.usartDMA_rxBuf, FLASH_HEAD, 4) == 0) && (UsartType1.rx_len == UART_ID_LEN))
       {
-        eui[0] = ( uint16_t )UsartType1.usartDMA_rxBuf[5];
-        eui[0] |= ( uint16_t )UsartType1.usartDMA_rxBuf[4] << 8;
-        eui[1] = ( uint16_t )UsartType1.usartDMA_rxBuf[7];
-        eui[1] |= ( uint16_t )UsartType1.usartDMA_rxBuf[6] << 8;
-        eui[2] = ( uint16_t )UsartType1.usartDMA_rxBuf[9];
-        eui[2] |= ( uint16_t )UsartType1.usartDMA_rxBuf[8] << 8;
-        eui[3] = ( uint16_t )UsartType1.usartDMA_rxBuf[11];
-        eui[3] |= ( uint16_t )UsartType1.usartDMA_rxBuf[10] << 8;
+        ComputeDevEui();
         SendData("OK\n", 3);
-        
         //break;
       }
       else
       {
-        SendData("ERROR,add FLEX before ID\n", 25);
+        SendData(UART_ERROR_LENGTH, strlen(UART_ERROR_LENGTH));
       }
     }
 
   }
+}
+void ComputeDevEui( void )
+{
+  int i = 0;
+  for (i = 4; i < UART_ID_LEN; i++)
+  {
+    if (UsartType1.usartDMA_rxBuf[i] >= '0' && UsartType1.usartDMA_rxBuf[i] <= '9')
+    {
+      UsartType1.usartDMA_rxBuf[i] -= 48;
+    }
+    else if (UsartType1.usartDMA_rxBuf[i] >= 'A' && UsartType1.usartDMA_rxBuf[i] <= 'F')
+    {
+      UsartType1.usartDMA_rxBuf[i] -= 55;
+    }
+    else if (UsartType1.usartDMA_rxBuf[i] >= 'a' && UsartType1.usartDMA_rxBuf[i] <= 'f')
+    {
+      UsartType1.usartDMA_rxBuf[i] -= 87;
+    }
+    else
+    {
+      SendData(UART_ERROR_ID, strlen(UART_ERROR_ID));
+    }
+  }
+  uart_eui[0] = (UsartType1.usartDMA_rxBuf[5] & 0x0F);
+  uart_eui[0] |= (UsartType1.usartDMA_rxBuf[4] << 4 & 0xF0);
+  uart_eui[1] = (UsartType1.usartDMA_rxBuf[7] & 0x0F);
+  uart_eui[1] |= (UsartType1.usartDMA_rxBuf[6] << 4 & 0xF0);
+  uart_eui[2] = (UsartType1.usartDMA_rxBuf[9] & 0x0F);
+  uart_eui[2] |= (UsartType1.usartDMA_rxBuf[8] << 4 & 0xF0);
+  uart_eui[3] = (UsartType1.usartDMA_rxBuf[11] & 0x0F);
+  uart_eui[3] |= (UsartType1.usartDMA_rxBuf[10] << 4 & 0xF0);
 }

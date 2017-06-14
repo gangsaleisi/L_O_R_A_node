@@ -115,6 +115,9 @@ Description: loramac-node board dependent definitions
 #define LED                                         PA_0
 
 
+#define UART_ID_LEN                                 12   //FLEX0001
+#define UART_ERROR_LENGTH "ERROR, Need to add FLEX before ID or length is not 12\n"
+#define UART_ERROR_ID     "ERROR, ID is wrong\n"      
 #define RECEIVELEN 128 
 #define USART_DMA_SENDING 1//发送未完成  
 #define USART_DMA_SENDOVER 0//发送完成  
@@ -162,6 +165,10 @@ void BoardGetUniqueId( uint8_t *id );
  * \brief Gets sensor temperature
  */
 float get_sensor_value( void );
+/*!
+ * \brief Compute DevEui
+ */
+void ComputeDevEui( void );
 /*!
  * \brief Initializes flash
  */

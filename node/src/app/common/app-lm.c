@@ -60,21 +60,20 @@ void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
     if( flags->Bits.JoinAccept == 1 ){
 #ifdef MODE_OTA
         memset(FlashArray, 0x00, sizeof(FlashArray));
+        Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 44);
         DevAddr = LoRaMacGetDevAddr();
-        memcpy(FlashArray, FLASH_HEAD, 4);
-        FlashArray[4] = ( DevAddr ) & 0xFF;
-        FlashArray[5] = ( DevAddr >> 8 ) & 0xFF;
-        FlashArray[6] = ( DevAddr >> 16 ) & 0xFF;
-        FlashArray[7] = ( DevAddr >> 24 ) & 0xFF;
+        memcpy(FlashArray + 6, FLASH_HEAD_2, 2);
+        FlashArray[8] = ( DevAddr ) & 0xFF;
+        FlashArray[9] = ( DevAddr >> 8 ) & 0xFF;
+        FlashArray[10] = ( DevAddr >> 16 ) & 0xFF;
+        FlashArray[11] = ( DevAddr >> 24 ) & 0xFF;
         LoRaMacGetNwkSKey(NwkSKey);
-        memcpy(FlashArray + 8, NwkSKey, sizeof(NwkSKey));
+        memcpy(FlashArray + 12, NwkSKey, sizeof(NwkSKey));
         LoRaMacGetAppSKey(AppSKey);
-        memcpy(FlashArray + 24, AppSKey, sizeof(AppSKey));
-        //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 40*4);
+        memcpy(FlashArray + 28, AppSKey, sizeof(AppSKey));
+        //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 44*4);
         LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
         loramac_join_flag = 1;
-        //memset(FlashArray, 0x00, sizeof(FlashArray));
-        //Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 40);
 #endif
     }
 
@@ -140,21 +139,45 @@ void app_lm_init(lm_callback_t cb)
 //flash format
 /*
 XX XXXX XX XXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
-FL  EUI EX DevAddr NwkSKey AppSKey
+##  EUI && DevAddr NwkSKey AppSKey
 */
+extern uint8_t uart_eui[4];
 void app_lm_para_init(void)
 {
+    uint8_t i = 0;
     memset(FlashArray, 0x00, sizeof(FlashArray));
     Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 44);
     //match deveui
     if (strncmp((char *)FlashArray, FLASH_HEAD_1, 2) != 0)
     {
         GetDevEui();
-        //aRxBuffer
-        //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 40*4);
+        for(i = 0; i < 4; i++)
+        {
+          DevEui[4 + i] = uart_eui[i];
+          AppEui[4 + i] = uart_eui[i];
+          NwkSKey[12 + i] = uart_eui[i];
+          AppSKey[12 + i] = uart_eui[i];
+          AppKey[12 + i] = uart_eui[i];
+        }
+        DevAddr = ( uint32_t )uart_eui[0];
+        DevAddr |= ( ( uint32_t )uart_eui[1] << 8 );
+        DevAddr |= ( ( uint32_t )uart_eui[2] << 16 );
+        DevAddr |= ( ( uint32_t )uart_eui[3] << 24 );
+        memset(FlashArray, 0x00, sizeof(FlashArray));
+        memcpy(FlashArray, FLASH_HEAD_1, 2);
+        memcpy(FlashArray+2, uart_eui, 4);
+        //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 6*4);
+        LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
+        
     }
     else if (strncmp((char *)FlashArray + 6, FLASH_HEAD_2, 2) == 0)
     {
+        for(i = 0; i < 4; i++)
+        {
+          DevEui[4 + i] = FlashArray[2 + i];
+          AppEui[4 + i] = FlashArray[2 + i];
+          AppKey[12 + i] = FlashArray[2 + i];
+        }
         DevAddr = ( uint32_t )FlashArray[8];
         DevAddr |= ( ( uint32_t )FlashArray[9] << 8 );
         DevAddr |= ( ( uint32_t )FlashArray[10] << 16 );
@@ -163,6 +186,22 @@ void app_lm_para_init(void)
         memcpy(AppSKey, FlashArray+28,sizeof(AppSKey));
         LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
         loramac_join_flag = 1;
+    }
+    else
+    {
+      for(i = 0; i < 4; i++)
+        {
+          DevEui[4 + i] = FlashArray[2 + i];
+          AppEui[4 + i] = FlashArray[2 + i];
+          NwkSKey[12 + i] = FlashArray[2 + i];
+          AppSKey[12 + i] = FlashArray[2 + i];
+          AppKey[12 + i] = FlashArray[2 + i];
+        }
+      DevAddr = ( uint32_t )FlashArray[2];
+      DevAddr |= ( ( uint32_t )FlashArray[3] << 8 );
+      DevAddr |= ( ( uint32_t )FlashArray[4] << 16 );
+      DevAddr |= ( ( uint32_t )FlashArray[5] << 24 );
+      LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
     }
 #ifdef MODE_OTA
     app_lm_set_mode(OTA);

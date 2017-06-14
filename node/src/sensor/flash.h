@@ -51,8 +51,8 @@
 #define __FLASH_H_
 
 /* Includes ------------------------------------------------------------------*/
-#define FLASH_HEAD_1      "FL"
-#define FLASH_HEAD_2      "EX"
+#define FLASH_HEAD_1      "##"
+#define FLASH_HEAD_2      "&&"
 #define FLASH_HEAD        "FLEX"
 
 #define USBD_DFU_APP_DEFAULT_ADD               0x0800ff00 /*ADDR_FLASH_PAGE_510*/

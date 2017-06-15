@@ -71,7 +71,7 @@ int main( void )
     BoardInitPeriph( );
 
     app_lm_init(app_lm_cb);
-    app_lm_para_init();
+   // app_lm_para_init();
     
     /* Uncomment below line to enable class C mode */
     //LoRaMacSetDeviceClass(CLASS_C);

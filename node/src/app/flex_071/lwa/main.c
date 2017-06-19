@@ -1,137 +1,294 @@
 /*
-    _/_/_/    _/_/_/    _/_/_/  _/_/_/  _/      _/    _/_/_/  _/    _/  _/_/_/_/
-   _/    _/    _/    _/          _/    _/_/    _/  _/        _/    _/  _/
-  _/_/_/      _/      _/_/      _/    _/  _/  _/  _/  _/_/  _/_/_/_/  _/_/_/
- _/    _/    _/          _/    _/    _/    _/_/  _/    _/  _/    _/  _/
-_/    _/  _/_/_/  _/_/_/    _/_/_/  _/      _/    _/_/_/  _/    _/  _/
-    (C)2015 RisingHF, all rights reserved.
+ / _____)             _              | |
+( (____  _____ ____ _| |_ _____  ____| |__
+ \____ \| ___ |    (_   _) ___ |/ ___)  _ \
+ _____) ) ____| | | || |_| ____( (___| | | |
+(______/|_____)_|_|_| \__)_____)\____)_| |_|
+    (C)2013 Semtech
 
-Description: LoRaWAW Class A/C Example
+Description: Ping-Pong implementation
 
+License: Revised BSD License, see LICENSE.TXT file include in the project
+
+Maintainer: Miguel Luis and Gregory Cristian
 */
+#include <string.h>
 #include "board.h"
 #include "radio.h"
-#include "LoRaMac.h"
-#include "app-lm.h"
-#include "LoRaMac-api-v3.h"
 
-#define APP_PORT                                        (2)
-#define APP_DATA_SIZE                                   (8)
-
-#define APP_TX_DUTYCYCLE                                (90000000)     // min
-#define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
-
-
-
-typedef enum{
-    SYS_STA_IDLE,       // report status in period
-    SYS_STA_TX,
-    SYS_STA_WAIT,
-}sys_sta_t;
-
-static TimerEvent_t ReportTimer;
-volatile bool ReportTimerEvent = false;
 extern Gpio_t Led;
+#if defined( USE_BAND_868 )
 
-uint8_t loramac_evt_flag = 0;
-uint8_t loramac_join_flag = 0;
-LoRaMacRxInfo *loramac_rx_info;
-lm_evt_t loramac_evt;
+#define RF_FREQUENCY                                868000000 // Hz
 
-sys_sta_t sys_sta = SYS_STA_IDLE;
+#elif defined( USE_BAND_915_HYBRID )
 
-uint8_t AppData[APP_DATA_SIZE];
+#define RF_FREQUENCY                                940000000 // Hz
 
-void OnReportTimerEvent( void )
+#endif
+
+#define TX_OUTPUT_POWER                             14        // dBm
+
+
+#define LORA_BANDWIDTH                              0         // [0: 125 kHz,
+                                                              //  1: 250 kHz,
+                                                              //  2: 500 kHz,
+                                                              //  3: Reserved]
+#define LORA_SPREADING_FACTOR                       7         // [SF7..SF12]
+#define LORA_CODINGRATE                             1         // [1: 4/5,
+                                                              //  2: 4/6,
+                                                              //  3: 4/7,
+                                                              //  4: 4/8]
+#define LORA_PREAMBLE_LENGTH                        8         // Same for Tx and Rx
+#define LORA_SYMBOL_TIMEOUT                         5         // Symbols
+#define LORA_FIX_LENGTH_PAYLOAD_ON                  false
+#define LORA_IQ_INVERSION_ON                        false
+
+
+typedef enum
 {
-    ReportTimerEvent = true;
-    
-}
+    LOWPOWER,
+    RX,
+    RX_TIMEOUT,
+    RX_ERROR,
+    TX,
+    TX_TIMEOUT,
+}States_t;
 
-void app_lm_cb (lm_evt_t evt, void *msg)
-{
-    switch(evt){
-    case LM_STA_TXDONE:
-    case LM_STA_RXDONE:
-    case LM_STA_RXTIMEOUT:
-    case LM_STA_ACK_RECEIVED:
-    case LM_STA_ACK_UNRECEIVED:
-    case LM_STA_CMD_RECEIVED:
-        loramac_rx_info = msg;
-        loramac_evt = evt;
-        loramac_evt_flag = 1;
-        break;
-    }
-}
+#define RX_TIMEOUT_VALUE                            1000000
+#define BUFFER_SIZE                                 64 // Define the payload size here
 
+const uint8_t PingMsg[] = "PING";
+const uint8_t PongMsg[] = "PONG";
+
+uint16_t BufferSize = BUFFER_SIZE;
+uint8_t Buffer[BUFFER_SIZE];
+
+States_t State = LOWPOWER;
+
+int8_t RssiValue = 0;
+int8_t SnrValue = 0;
+
+
+
+
+
+/*!
+ * Radio events function pointer
+ */
+static RadioEvents_t RadioEvents;
+
+/*!
+ * \brief Function to be executed on Radio Tx Done event
+ */
+void OnTxDone( void );
+
+/*!
+ * \brief Function to be executed on Radio Rx Done event
+ */
+void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr );
+
+/*!
+ * \brief Function executed on Radio Tx Timeout event
+ */
+void OnTxTimeout( void );
+
+/*!
+ * \brief Function executed on Radio Rx Timeout event
+ */
+void OnRxTimeout( void );
+
+/*!
+ * \brief Function executed on Radio Rx Error event
+ */
+void OnRxError( void );
+
+/**
+ * Main application entry point.
+ */
 int main( void )
 {
-    BoardInitMcu( );
-    BoardInitPeriph( );
-    
-    
-    app_lm_init(app_lm_cb);
-#ifdef MODE_OTA
-    app_lm_para_init();
-#endif
-    /* Uncomment below line to enable class C mode */
-    //LoRaMacSetDeviceClass(CLASS_C);
+    bool isMaster = true;
+    uint8_t i;
 
-    TimerInit( &ReportTimer, OnReportTimerEvent );
-    ReportTimerEvent = true;
-    
+    // Target board initialization
+    BoardInitMcu( );
+   // BoardInitPeriph( );
+
+    // Radio initialization
+    RadioEvents.TxDone = OnTxDone;
+    RadioEvents.RxDone = OnRxDone;
+    RadioEvents.TxTimeout = OnTxTimeout;
+    RadioEvents.RxTimeout = OnRxTimeout;
+    RadioEvents.RxError = OnRxError;
+
+    Radio.Init( &RadioEvents );
+
+    Radio.SetChannel( RF_FREQUENCY );
+
+
+    Radio.SetTxConfig( MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
+                                   LORA_SPREADING_FACTOR, LORA_CODINGRATE,
+                                   LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
+                                   true, 0, 0, LORA_IQ_INVERSION_ON, 3e6 );
+
+    Radio.SetRxConfig( MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
+                                   LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
+                                   LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
+                                   0, true, 0, 0, LORA_IQ_INVERSION_ON, true );
+
+
+    Radio.Rx( RX_TIMEOUT_VALUE );
+
     while( 1 )
     {
-        switch(sys_sta){
-        case SYS_STA_IDLE:
-            if(ReportTimerEvent == true){
-                ReportTimerEvent = false;
-                sys_sta = SYS_STA_TX;
-            }
-            break;
-        case SYS_STA_TX:
-            // Toggle LED 1
-            GpioWrite( &Led, 1 );
-            DelayMs( 5 );
-            GpioWrite( &Led, 0 );
-            if( loramac_join_flag == 0 && app_lm_get_mode() == OTA){
-              app_lm_join();
-              sys_sta = SYS_STA_WAIT;
+        switch( State )
+        {
+        case RX:
+            if( isMaster == true )
+            {
+                if( BufferSize > 0 )
+                {
+                    if( strncmp( ( const char* )Buffer, ( const char* )PongMsg, 4 ) == 0 )
+                    {
+                        // Indicates on a LED that the received frame is a PONG
+                        //GpioToggle( &Led1 );
+                        GpioWrite( &Led, 1 ); 
+                        DelayMs( 5 );
+                        GpioWrite( &Led, 0 ); 
+                        // Send the next PING frame
+                        Buffer[0] = 'P';
+                        Buffer[1] = 'I';
+                        Buffer[2] = 'N';
+                        Buffer[3] = 'G';
+                        // We fill the buffer with numbers for the payload
+                        for( i = 4; i < BufferSize; i++ )
+                        {
+                            Buffer[i] = i - 4;
+                        }
+                        DelayMs( 1 );
+                        Radio.Send( Buffer, BufferSize );
+                    }
+                    else if( strncmp( ( const char* )Buffer, ( const char* )PingMsg, 4 ) == 0 )
+                    { // A master already exists then become a slave
+                        isMaster = false;
+                        Radio.Rx( RX_TIMEOUT_VALUE );
+                    }
+                    else // valid reception but neither a PING or a PONG message
+                    {    // Set device as master ans start again
+                        isMaster = true;
+                        Radio.Rx( RX_TIMEOUT_VALUE );
+                    }
+                }
             }
             else
             {
-              sprintf((char *)AppData, "%8.2f", (double)get_sensor_value());
-              //jason
-              //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-              if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-              sys_sta = SYS_STA_WAIT;
-              }else{
-                  sys_sta = SYS_STA_IDLE;
-                  ReportTimerEvent = false;
-                  TimerStop( &ReportTimer );
-                  TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
-                  TimerStart( &ReportTimer );
-              }
+                if( BufferSize > 0 )
+                {
+                    if( strncmp( ( const char* )Buffer, ( const char* )PingMsg, 4 ) == 0 )
+                    {
+                        // Indicates on a LED that the received frame is a PING
+                        //GpioToggle( &Led1 );
+                        GpioWrite( &Led, 1 ); 
+                        DelayMs( 5 );
+                        GpioWrite( &Led, 0 ); 
+                        // Send the reply to the PONG string
+                        Buffer[0] = 'P';
+                        Buffer[1] = 'O';
+                        Buffer[2] = 'N';
+                        Buffer[3] = 'G';
+                        // We fill the buffer with numbers for the payload
+                        for( i = 4; i < BufferSize; i++ )
+                        {
+                            Buffer[i] = i - 4;
+                        }
+                        DelayMs( 1 );
+                        Radio.Send( Buffer, BufferSize );
+                    }
+                    else // valid reception but not a PING as expected
+                    {    // Set device as master and start again
+                        isMaster = true;
+                        Radio.Rx( RX_TIMEOUT_VALUE );
+                    }
+                }
             }
+            State = LOWPOWER;
             break;
-        case SYS_STA_WAIT:
-
+        case TX:
+            // Indicates on a LED that we have sent a PING [Master]
+            // Indicates on a LED that we have sent a PONG [Slave]
+            //GpioToggle( &Led1 );
+            Radio.Rx( RX_TIMEOUT_VALUE );
+            State = LOWPOWER;
             break;
-        }
-
-        if(loramac_evt_flag == 1){
-            __disable_irq();
-            loramac_evt_flag = 0;
-            __enable_irq();
-
-            sys_sta = SYS_STA_IDLE;
-
-            ReportTimerEvent = false;
-            TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
-            TimerStart( &ReportTimer );
+        case RX_TIMEOUT:
+        case RX_ERROR:
+            if( isMaster == true )
+            {
+                // Send the next PING frame
+                Buffer[0] = 'P';
+                Buffer[1] = 'I';
+                Buffer[2] = 'N';
+                Buffer[3] = 'G';
+                for( i = 4; i < BufferSize; i++ )
+                {
+                    Buffer[i] = i - 4;
+                }
+                DelayMs( 1 );
+                Radio.Send( Buffer, BufferSize );
+            }
+            else
+            {
+                Radio.Rx( RX_TIMEOUT_VALUE );
+            }
+            State = LOWPOWER;
+            break;
+        case TX_TIMEOUT:
+            Radio.Rx( RX_TIMEOUT_VALUE );
+            State = LOWPOWER;
+            break;
+        case LOWPOWER:
+        default:
+            // Set low power
+            break;
         }
 
         TimerLowPowerHandler( );
+
     }
+}
+
+void OnTxDone( void )
+{
+    Radio.Sleep( );
+    State = TX;
+}
+
+void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
+{
+    Radio.Sleep( );
+    BufferSize = size;
+    memcpy( Buffer, payload, BufferSize );
+    RssiValue = rssi;
+    SnrValue = snr;
+    State = RX;
+}
+
+void OnTxTimeout( void )
+{
+    Radio.Sleep( );
+    State = TX_TIMEOUT;
+}
+
+void OnRxTimeout( void )
+{
+    Radio.Sleep( );
+    State = RX_TIMEOUT;
+}
+
+void OnRxError( void )
+{
+    Radio.Sleep( );
+    State = RX_ERROR;
 }
 

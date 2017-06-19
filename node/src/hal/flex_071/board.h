@@ -27,7 +27,6 @@ Description: loramac-node board dependent definitions
 #include "adc.h"
 #include "spi.h"
 #include "i2c.h"
-#include "flash.h"
 #include "radio.h"
 #include "sx1276/sx1276.h"
 #include "rtc-board.h"
@@ -143,10 +142,4 @@ uint8_t BoardMeasureBatterieLevel( void );
 void BoardGetUniqueId( uint8_t *id );
 
 float get_sensor_value( void );
-extern uint16_t Flash_If_Init(void);
-extern uint16_t Flash_If_Erase(uint32_t Add);
-extern uint16_t Flash_If_Erase_Page(uint32_t Add);
-extern uint16_t Flash_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len);
-extern uint8_t *Flash_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len);
-extern uint16_t Flash_If_DeInit(void);
 #endif // __BOARD_H__

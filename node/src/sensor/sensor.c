@@ -27,27 +27,21 @@ float get_sensor_value()
 #if defined (MCP9700)
 extern Adc_t Adc;
 
-uint16_t GetAdcVref()
-{
-    uint16_t vdiv = 0;
-    uint16_t voltage = 0;
-
-    vdiv = AdcReadChannel( &Adc, ADC_CHANNEL_VREFINT);
-    voltage = FACTORY_POWER_SUPPLY * ( ( float )VREFINT_CAL / ( float )vdiv );
-
-    return voltage;
-}
 uint16_t Mcp97SensorAdc()
 {
+    uint16_t vdd = 0;
     uint16_t vdiv = 0;
     uint16_t voltage = 0;
-    uint16_t vref = 0;
+    uint16_t vref = VREFINT_CAL;
 
-    vref = GetAdcVref();
-    vdiv = AdcReadChannel( &Adc, BAT_LEVEL_CHANNEL);
-    voltage = vref * ( ( float )vdiv / ( float )ADC_MAX_VALUE );
+    vdiv = AdcReadChannel( &Adc, BAT_LEVEL_CHANNEL );
+    vdd = ( float )FACTORY_POWER_SUPPLY * ( float )VREFINT_CAL / ( float )vref;
+    voltage = vdd * ( ( float )vdiv / ( float )ADC_MAX_VALUE );
 
-    return voltage;
+    //                                vDiv
+    // Divider bridge  VBAT <-> 47k -<--|-->- 47k <-> GND => vBat = 2 * vDiv
+    //voltage = 2 * voltage;
+    return (voltage ? voltage : 0);
 }
 #elif defined (MCP9800)
 extern I2c_t I2c;

@@ -3542,30 +3542,3 @@ void LoRaMacTestSetDutyCycleOn( bool enable )
 {
     DutyCycleOn = enable;
 }
-
-uint32_t LoRaMacGetDevAddr( void )
-{
-   return LoRaMacDevAddr;
-}
-
-uint8_t * LoRaMacGetNwkSKey( uint8_t *buf )
-{
-  uint8_t i = 0;
-  uint8_t *psrc = (uint8_t *)LoRaMacNwkSKey;
-  for(i = 0; i < sizeof(LoRaMacNwkSKey); i++)
-  {
-    buf[i] = *psrc++;
-  }
-  return (uint8_t *)buf;
-}
-
-uint8_t * LoRaMacGetAppSKey( uint8_t *buf )
-{
-  uint8_t i = 0;
-  uint8_t *psrc = (uint8_t *)LoRaMacAppSKey;
-  for(i = 0; i < sizeof(LoRaMacAppSKey); i++)
-  {
-    buf[i] = *psrc++;
-  }
-  return (uint8_t *)buf;
-}

@@ -99,7 +99,7 @@
  * receiving an acknowledge.
  * AckTimeout = \ref ACK_TIMEOUT + Random( -\ref ACK_TIMEOUT_RND, \ref ACK_TIMEOUT_RND )
  */
-#define ACK_TIMEOUT                                 7000000
+#define ACK_TIMEOUT                                 2000000
 
 /*!
  * Random number of seconds after the start of the second reception window without
@@ -1674,9 +1674,7 @@ LoRaMacStatus_t LoRaMacMlmeRequest( MlmeReq_t *mlmeRequest );
  *          \ref LORAMAC_STATUS_DEVICE_OFF.
  */
 LoRaMacStatus_t LoRaMacMcpsRequest( McpsReq_t *mcpsRequest );
-uint32_t LoRaMacGetDevAddr( void );
-uint8_t * LoRaMacGetNwkSKey( uint8_t *buf );
-uint8_t * LoRaMacGetAppSKey( uint8_t *buf );
+
 /*! \} defgroup LORAMAC */
 
 #endif // __LORAMAC_H__

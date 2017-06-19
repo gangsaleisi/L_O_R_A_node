@@ -46,7 +46,7 @@
 #include <stdint.h>
 
 /* define if you have fast 32-bit types on your system */
-#if 0
+#if 1
 #  define HAVE_UINT_32T
 #endif
 

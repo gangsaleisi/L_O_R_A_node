@@ -96,7 +96,7 @@ void BoardInitMcu( void )
     I2cInit( &I2c, I2C_SCL, I2C_SDA );
 #endif
     AdcInit( &Adc, BAT_LEVEL_PIN );
-    Flash_If_Init();
+    
 #if USE_DEBUGGER
     /* Enable debug under stop mode */
     RCC->APB2ENR |= RCC_APB2ENR_DBGMCUEN;
@@ -111,7 +111,6 @@ void BoardDeInitMcu( void )
     I2cDeInit( &I2c );
 #endif
     AdcDeInit( &Adc );
-    Flash_If_DeInit();
     SpiDeInit( &SX1276.Spi );
     SX1276IoDeInit( );
 

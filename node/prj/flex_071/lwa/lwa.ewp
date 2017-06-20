@@ -207,10 +207,10 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
-                    <state>STM32L071xx</state>
+                    <state>STM32L051xx</state>
                     <state>LOW_POWER_MODE_ENABLE</state>
                     <state>USE_BAND_915_HYBRID</state>
-                    <state>MCP9700</state>
+                    <state>TMP006</state>
                     <state>MODE_OTA</state>
                     <state>USE_DEBUGGER</state>
                 </option>

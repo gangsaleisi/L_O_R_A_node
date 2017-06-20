@@ -1979,7 +1979,8 @@ typedef struct
 #define RCC_CIFR_MSIRDYF                    ((uint32_t)0x00000020)        /*!< MSI Ready Interrupt flag */
 #define RCC_CIFR_LSECSSF                    ((uint32_t)0x00000080)        /*!< LSE Clock Security System Interrupt flag */
 #define RCC_CIFR_CSSF                       ((uint32_t)0x00000100)        /*!< Clock Security System Interrupt flag */
-
+#define RCC_CIFR_CSSLSEF  RCC_CIFR_LSECSSF                   
+#define RCC_CIFR_CSSHSEF  RCC_CIFR_CSSF 
 /*!<******************  Bit definition for RCC_CICR register  ********************/
 #define RCC_CICR_LSIRDYC                    ((uint32_t)0x00000001)        /*!< LSI Ready Interrupt Clear */
 #define RCC_CICR_LSERDYC                    ((uint32_t)0x00000002)        /*!< LSE Ready Interrupt Clear */

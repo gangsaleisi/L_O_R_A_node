@@ -18,13 +18,20 @@ Gpio_t UnUsed;
 I2C_HandleTypeDef hi2c1;
 
 static void BoardUnusedIoInit( void );
-#ifdef TMP006
+
 static void MX_GPIO_Init(void);
-#endif
+
 #define HSI_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define PLL_TIMEOUT_VALUE          ((uint32_t)0x1FFFF)  /* 100 ms */
 #define CLOCKSWITCH_TIMEOUT_VALUE  ((uint32_t)0x1FFFF)  /* 5 s    */
 
+#define UART_FIFO_TX_SIZE                                8
+#define UART_FIFO_RX_SIZE                                256
+uint8_t UartTxBuffer[UART_FIFO_TX_SIZE];
+uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
+extern void MX_DMA_Init(void);
+extern void MX_USART2_UART_Init(void);
+extern void SendData(uint8_t *pdata, uint16_t Length);
 void SystemClock_Config(void)
 {
     uint32_t tickstart;
@@ -93,8 +100,8 @@ void BoardInitMcu( void )
         
         McuInitialized = true;
     }
-#if defined( TMP006 )
     MX_GPIO_Init();
+#if defined( TMP006 )
     MX_I2C1_Init();
 #endif
     AdcInit( &Adc, BAT_LEVEL_PIN );
@@ -167,12 +174,79 @@ static void BoardUnusedIoInit( void )
     GpioInit( &UnUsed, UNUSED_12, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
     GpioInit( &UnUsed, UNUSED_13, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
 }
-#ifdef TMP006
+
 static void MX_GPIO_Init(void)
 {
-
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  #ifdef TMP006
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  #endif
 
 }
-#endif
+
+
+UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_usart2_rx;
+DMA_HandleTypeDef hdma_usart2_tx;
+USART_RECEIVETYPE UsartType1; 
+uint8_t uart_eui[4] = {0};
+void GetDevEui(void)
+{
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_USART2_UART_Init();
+  HAL_UART_Receive_DMA(&huart2, UsartType1.usartDMA_rxBuf, RECEIVELEN);  
+  __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+  while(1)
+  {
+
+    if(UsartType1.receive_flag)//如果产生了空闲中断  
+    {
+      UsartType1.receive_flag=0;//清零标记  
+      if( (strncmp((char *)UsartType1.usartDMA_rxBuf, FLASH_HEAD, 4) == 0) && (UsartType1.rx_len == UART_ID_LEN))
+      {
+        ComputeDevEui();
+        SendData("OK\n", 3);
+        break;
+      }
+      else
+      {
+        SendData(UART_ERROR_LENGTH, strlen(UART_ERROR_LENGTH));
+      }
+    }
+
+  }
+}
+void ComputeDevEui( void )
+{
+  int i = 0;
+  for (i = 4; i < UART_ID_LEN; i++)
+  {
+    if (UsartType1.usartDMA_rxBuf[i] >= '0' && UsartType1.usartDMA_rxBuf[i] <= '9')
+    {
+      UsartType1.usartDMA_rxBuf[i] -= 48;
+    }
+    else if (UsartType1.usartDMA_rxBuf[i] >= 'A' && UsartType1.usartDMA_rxBuf[i] <= 'F')
+    {
+      UsartType1.usartDMA_rxBuf[i] -= 55;
+    }
+    else if (UsartType1.usartDMA_rxBuf[i] >= 'a' && UsartType1.usartDMA_rxBuf[i] <= 'f')
+    {
+      UsartType1.usartDMA_rxBuf[i] -= 87;
+    }
+    else
+    {
+      SendData(UART_ERROR_ID, strlen(UART_ERROR_ID));
+    }
+  }
+  uart_eui[0] = (UsartType1.usartDMA_rxBuf[5] & 0x0F);
+  uart_eui[0] |= (UsartType1.usartDMA_rxBuf[4] << 4 & 0xF0);
+  uart_eui[1] = (UsartType1.usartDMA_rxBuf[7] & 0x0F);
+  uart_eui[1] |= (UsartType1.usartDMA_rxBuf[6] << 4 & 0xF0);
+  uart_eui[2] = (UsartType1.usartDMA_rxBuf[9] & 0x0F);
+  uart_eui[2] |= (UsartType1.usartDMA_rxBuf[8] << 4 & 0xF0);
+  uart_eui[3] = (UsartType1.usartDMA_rxBuf[11] & 0x0F);
+  uart_eui[3] |= (UsartType1.usartDMA_rxBuf[10] << 4 & 0xF0);
+}

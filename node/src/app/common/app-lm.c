@@ -16,7 +16,7 @@ Description: LoRaMac-Node application file
 
 lm_callback_t lm_callback_g;
 //jason
-#define LOAD_VALUE      0x30
+#define LOAD_VALUE      0x3
 static uint8_t DevEui[] = {
     0x46, 0x4c, 0x45, 0x58, 0x01, 0x01, 0x00, 0x00
 };
@@ -40,8 +40,9 @@ static uint32_t DevAddr;
 static LoRaMacCallbacks_t LoRaMacCallbacks;
 LoRaMacRxInfo RxInfo;
 LoRaMode_t Mode = ABP;
-uint8_t FlashArray[41] = {0};
+uint8_t FlashArray[45] = {0};
 extern uint8_t loramac_join_flag;
+extern void GetDevEui(void);
 void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
 {
     switch( info->Status ){
@@ -58,16 +59,17 @@ void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
     if( flags->Bits.JoinAccept == 1 ){
 #ifdef MODE_OTA
         memset(FlashArray, 0x00, sizeof(FlashArray));
+        Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 44);
         DevAddr = LoRaMacGetDevAddr();
-        memcpy(FlashArray, FLASH_HEAD, 4);
-        FlashArray[4] = ( DevAddr ) & 0xFF;
-        FlashArray[5] = ( DevAddr >> 8 ) & 0xFF;
-        FlashArray[6] = ( DevAddr >> 16 ) & 0xFF;
-        FlashArray[7] = ( DevAddr >> 24 ) & 0xFF;
+        memcpy(FlashArray + 6, FLASH_HEAD_2, 2);
+        FlashArray[8] = ( DevAddr ) & 0xFF;
+        FlashArray[9] = ( DevAddr >> 8 ) & 0xFF;
+        FlashArray[10] = ( DevAddr >> 16 ) & 0xFF;
+        FlashArray[11] = ( DevAddr >> 24 ) & 0xFF;
         LoRaMacGetNwkSKey(NwkSKey);
-        memcpy(FlashArray + 8, NwkSKey, sizeof(NwkSKey));
+        memcpy(FlashArray + 12, NwkSKey, sizeof(NwkSKey));
         LoRaMacGetAppSKey(AppSKey);
-        memcpy(FlashArray + 24, AppSKey, sizeof(AppSKey));
+        memcpy(FlashArray + 28, AppSKey, sizeof(AppSKey));
         //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 40*4);
         LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
         loramac_join_flag = 1;
@@ -140,26 +142,71 @@ void app_lm_init(lm_callback_t cb)
 XXXX XXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
 FLEX DevAddr NwkSKey AppSKey
 */
-
+extern uint8_t uart_eui[4];
 void app_lm_para_init(void)
 {
-    app_lm_set_mode(OTA);
-    if (app_lm_get_mode() == OTA)
+#if 1
+    uint8_t i = 0;
+    memset(FlashArray, 0x00, sizeof(FlashArray));
+    Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 44);
+    if (strncmp((char *)FlashArray, FLASH_HEAD_1, 2) != 0)
     {
-        memset(FlashArray, 0x00, sizeof(FlashArray));
-        //Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 40);
-        if (strncmp((char *)FlashArray, FLASH_HEAD, 4) == 0)
+        GetDevEui();
+        for(i = 0; i < 4; i++)
         {
-          DevAddr = ( uint32_t )FlashArray[4];
-          DevAddr |= ( ( uint32_t )FlashArray[5] << 8 );
-          DevAddr |= ( ( uint32_t )FlashArray[6] << 16 );
-          DevAddr |= ( ( uint32_t )FlashArray[7] << 24 );
-          memcpy(NwkSKey, FlashArray+8, sizeof(NwkSKey));
-          memcpy(AppSKey, FlashArray+24,sizeof(AppSKey));
+          DevEui[4 + i] = uart_eui[i];
+          AppEui[4 + i] = uart_eui[i];
+          NwkSKey[12 + i] = uart_eui[i];
+          AppSKey[12 + i] = uart_eui[i];
+          AppKey[12 + i] = uart_eui[i];
+        }
+        DevAddr = ( uint32_t )uart_eui[3];
+        DevAddr |= ( ( uint32_t )uart_eui[2] << 8 );
+        DevAddr |= ( ( uint32_t )uart_eui[1] << 16 );
+        DevAddr |= ( ( uint32_t )uart_eui[0] << 24 );
+        memset(FlashArray, 0x00, sizeof(FlashArray));
+        memcpy(FlashArray, FLASH_HEAD_1, 2);
+        memcpy(FlashArray+2, uart_eui, 4);
+        //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 6*4);
+        LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
+    }
+    else if (strncmp((char *)FlashArray + 6, FLASH_HEAD_2, 2) == 0)
+    {
+        for(i = 0; i < 4; i++)
+        {
+          DevEui[4 + i] = FlashArray[2 + i];
+          AppEui[4 + i] = FlashArray[2 + i];
+          AppKey[12 + i] = FlashArray[2 + i];
+        }
+        DevAddr = ( uint32_t )FlashArray[11];
+        DevAddr |= ( ( uint32_t )FlashArray[10] << 8 );
+        DevAddr |= ( ( uint32_t )FlashArray[9] << 16 );
+        DevAddr |= ( ( uint32_t )FlashArray[8] << 24 );
+        memcpy(NwkSKey, FlashArray+12, sizeof(NwkSKey));
+        memcpy(AppSKey, FlashArray+28,sizeof(AppSKey));
           LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
           loramac_join_flag = 1;
-        }
     }
+    else
+    {
+      for(i = 0; i < 4; i++)
+        {
+          DevEui[4 + i] = FlashArray[2 + i];
+          AppEui[4 + i] = FlashArray[2 + i];
+          NwkSKey[12 + i] = FlashArray[2 + i];
+          AppSKey[12 + i] = FlashArray[2 + i];
+          AppKey[12 + i] = FlashArray[2 + i];
+        }
+      DevAddr = ( uint32_t )FlashArray[5];
+      DevAddr |= ( ( uint32_t )FlashArray[4] << 8 );
+      DevAddr |= ( ( uint32_t )FlashArray[3] << 16 );
+      DevAddr |= ( ( uint32_t )FlashArray[2] << 24 );
+      LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
+    }
+#endif
+#ifdef MODE_OTA
+    app_lm_set_mode(OTA);
+#endif
 }
 
 int app_lm_send( LoRaFrameType_t type, uint8_t *buf, int size, int retry)
@@ -198,7 +245,7 @@ int app_lm_send( LoRaFrameType_t type, uint8_t *buf, int size, int retry)
 uint8_t app_lm_join(void)
 {
     uint8_t status = 0;
-    Flash_If_Erase_Page((uint32_t)USBD_DFU_APP_DEFAULT_ADD);
+    //Flash_If_Erase_Page((uint32_t)USBD_DFU_APP_DEFAULT_ADD);
     status = LoRaMacJoinReq(DevEui, AppEui, AppKey);
     
     return status;

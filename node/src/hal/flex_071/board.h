@@ -102,6 +102,8 @@ Description: loramac-node board dependent definitions
 
 #define I2C_SCL                                     PB_6
 #define I2C_SDA                                     PB_7
+#define UART_TX                                     PA_2
+#define UART_RX                                     PA_3
 
 #define RADIO_MOSI                                  PA_7
 #define RADIO_MISO                                  PA_6
@@ -126,6 +128,19 @@ Description: loramac-node board dependent definitions
 #define UNUSED_11                                   PB_5
 #define UNUSED_12                                   PB_6
 #define UNUSED_13                                   PB_7
+#define UART_ID_LEN                                 12   //FLEX0001
+#define UART_ERROR_LENGTH "ERROR, Need to add FLEX before ID or length is not 12\n"
+#define UART_ERROR_ID     "ERROR, ID is wrong\n"      
+#define RECEIVELEN 128 
+#define USART_DMA_SENDING 1//·¢ËÍÎ´Íê³É  
+#define USART_DMA_SENDOVER 0//·¢ËÍÍê³É  
+typedef struct  
+{  
+uint8_t receive_flag:1;//¿ÕÏÐ½ÓÊÕ±ê¼Ç  
+uint8_t dmaSend_flag:1;//·¢ËÍÍê³É±ê¼Ç  
+uint16_t rx_len;//½ÓÊÕ³¤¶È  
+uint8_t usartDMA_rxBuf[RECEIVELEN];//DMA½ÓÊÕ»º´æ  
+}USART_RECEIVETYPE; 
 /*!
  * \brief Initializes the target board peripherals.
  */
@@ -136,6 +151,7 @@ void BoardInitMcu( void );
  */
 void BoardInitPeriph( void );
 
+void BoardInitParameter( void );
 /*!
  * \brief De-initializes the target board peripherals to decrease power
  *        consumption.
@@ -161,6 +177,7 @@ void MX_I2C1_Init(void);
 void MX_I2C1_DeInit( void );
 float get_sensor_value( void );
 
+void ComputeDevEui( void );
 extern uint16_t Flash_If_Init(void);
 extern uint16_t Flash_If_Erase(uint32_t Add);
 extern uint16_t Flash_If_Erase_Page(uint32_t Add);

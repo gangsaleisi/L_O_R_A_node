@@ -147,7 +147,19 @@ Description: loramac-node board dependent definitions
 #define SWDIO                                       PA_13
 #define SWCLK                                       PA_14
 
-
+#define UART_ID_LEN                                 12   //FLEX0001
+#define UART_ERROR_LENGTH "ERROR, Need to add FLEX before ID or length is not 12\n"
+#define UART_ERROR_ID     "ERROR, ID is wrong\n"      
+#define RECEIVELEN 128 
+#define USART_DMA_SENDING 1//﹞⊿?赤?∩赤那3谷  
+#define USART_DMA_SENDOVER 0//﹞⊿?赤赤那3谷  
+typedef struct  
+{  
+uint8_t receive_flag:1;//???D?車那?㊣那??  
+uint8_t dmaSend_flag:1;//﹞⊿?赤赤那3谷㊣那??  
+uint16_t rx_len;//?車那?3∟?豕  
+uint8_t usartDMA_rxBuf[RECEIVELEN];//DMA?車那??o∩?  
+}USART_RECEIVETYPE; 
 
 
 /*!

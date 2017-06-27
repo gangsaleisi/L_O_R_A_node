@@ -2096,6 +2096,9 @@
         <file>
             <name>$PROJ_DIR$\..\..\..\src\hal\flex_071\timer-board.c</name>
         </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\src\hal\flex_071\uart-board.c</name>
+        </file>
     </group>
     <group>
         <name>lib</name>
@@ -2149,6 +2152,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\src\sensor\sensor.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\src\sensor\stm32l0xx_hal_msp.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\src\sensor\stm32l0xx_it.c</name>
         </file>
     </group>
     <group>

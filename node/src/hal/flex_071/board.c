@@ -16,6 +16,19 @@ Adc_t Adc;
 Gpio_t Led;
 Gpio_t UnUsed;
 I2C_HandleTypeDef hi2c1;
+UART_HandleTypeDef huart2;
+USART_RECEIVETYPE UsartType1; 
+DMA_HandleTypeDef hdma_usart2_rx;
+DMA_HandleTypeDef hdma_usart2_tx;
+static void BoardUnusedIoInit( void );
+
+static void MX_GPIO_Init(void);
+#define UART_FIFO_TX_SIZE                                8
+#define UART_FIFO_RX_SIZE                                256
+uint8_t UartTxBuffer[UART_FIFO_TX_SIZE];
+uint8_t UartRxBuffer[UART_FIFO_RX_SIZE];
+extern void MX_DMA_Init(void);
+extern void MX_USART2_UART_Init(void);
 
 static void BoardUnusedIoInit( void );
 #ifdef TMP006
@@ -93,8 +106,13 @@ void BoardInitMcu( void )
         
         McuInitialized = true;
     }
-#if defined( TMP006 )
     MX_GPIO_Init();
+    MX_DMA_Init();
+    MX_USART2_UART_Init();
+    HAL_UART_Receive_DMA(&huart2, UsartType1.usartDMA_rxBuf, RECEIVELEN);  
+    __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+#if defined( TMP006 )
+    
     MX_I2C1_Init();
 #endif
     AdcInit( &Adc, BAT_LEVEL_PIN );
@@ -167,12 +185,13 @@ static void BoardUnusedIoInit( void )
     GpioInit( &UnUsed, UNUSED_12, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
     GpioInit( &UnUsed, UNUSED_13, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
 }
-#ifdef TMP006
+
 static void MX_GPIO_Init(void)
 {
-
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   /* GPIO Ports Clock Enable */
+  #ifdef TMP006
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  #endif
 
 }
-#endif

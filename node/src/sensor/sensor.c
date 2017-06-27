@@ -68,6 +68,9 @@ float Tmp006SensorI2c( void )
     float b2 = 4.63*pow(10,-9);  
     float c2 = 13.4; 
 
+    #if 0
+    //Tmp006Write( CONF_REG, conf_default, 2 );
+    //Tmp006Read( CONF_REG, tempBuf, 2 );
     //read local temperature
     Tmp006Read( TEMP_REG, tempBuf, 2 );
     Tdie_Temp = ((tempBuf[0] << 8) +  tempBuf[1]);
@@ -100,6 +103,33 @@ float Tmp006SensorI2c( void )
     fVobj = Vobj - Vos + c2*(Vobj - Vos)*(Vobj - Vos);  
     Tobj = sqrt(sqrt(pow(Tdie,4) + fVobj/S));  
     Tobj -= 273.15;  
+#else
+    Tmp006Read( CONF_REG, tempBuf, 2 );
+    while(tempBuf[1] & 0x80 != 0x80);
+    
+    Tmp006Read( TEMP_REG, tempBuf, 2 );
+    Tdie = ((tempBuf[0] << 8) +  tempBuf[1]) * 0.0078125 + 273.15;
+    
+    Tmp006Read( SENSOR_REG, tempBuf, 2 );
+    Vobj_Read  = (tempBuf[0] << 8) + tempBuf[1];
+    if(Vobj_Read >= 0x8000)  
+    {
+        Vobj = -(0xffff - Vobj_Read)*156.25;  
+    }
+
+    else
+    {
+        Vobj = Vobj_Read*156.25;   
+    }
+    Vobj *= pow(10,-9);  
+    S = S0*(1 + a1*(Tdie - Tref) + a2*(Tdie-Tref)*(Tdie - Tref));  
+    Vos = b0 + b1*(Tdie - Tref) + b2*(Tdie - Tref)*(Tdie - Tref);  
+    
+    fVobj = Vobj - Vos + c2*(Vobj - Vos)*(Vobj - Vos);  
+    Tobj = sqrt(sqrt(pow(Tdie,4) + fVobj/S));  
+    Tobj -= 273.15;  
+#endif
+    //Tobj += 1;  
     return( Tobj );
 }
 

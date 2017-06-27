@@ -21,7 +21,7 @@ Description: LoRaWAW Class A/C Example
 #define APP_TX_DUTYCYCLE                                (90000000)     // min
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
 
-
+extern void SendData(uint8_t *pdata, uint16_t Length);
 
 typedef enum{
     SYS_STA_IDLE,       // report status in period
@@ -74,6 +74,13 @@ int main( void )
 #ifdef MODE_OTA
     app_lm_para_init();
 #endif
+    while(1)
+    {
+      sprintf((char *)AppData, "%7f", (double)get_sensor_value());
+      AppData[7] = '\n';
+      SendData(AppData, 8);
+      DelayMs( 1000 );
+    }
     /* Uncomment below line to enable class C mode */
 #ifdef CLASS_TYPE_C
     LoRaMacSetDeviceClass(CLASS_C);

@@ -12,13 +12,17 @@ mcp9700A:tc=10,v0=500
 float get_sensor_value()
 {
     float vamb = 0.0;
+    uint8_t i = 3;
 #if defined (MCP9700)
     uint16_t vout = Mcp97SensorAdc();
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
-    vamb = Tmp006SensorI2c();
-
+    while (i--)
+    {
+      vamb += Tmp006SensorI2c();
+    }
+    vamb = vamb/3;
 #else
     //todo
 #endif
@@ -99,7 +103,12 @@ float Tmp006SensorI2c( void )
     Vos = b0 + b1*(Tdie - Tref) + b2*(Tdie - Tref)*(Tdie - Tref);  
     fVobj = Vobj - Vos + c2*(Vobj - Vos)*(Vobj - Vos);  
     Tobj = sqrt(sqrt(pow(Tdie,4) + fVobj/S));  
-    Tobj -= 273.15;  
+    Tobj -= 273.15; 
+    //compensate
+    if (Tobj >= 30)
+      Tobj += 1.3;
+    else if (Tobj < 30 && Tobj > 20)
+      Tobj += 0.8;
     return( Tobj );
 }
 

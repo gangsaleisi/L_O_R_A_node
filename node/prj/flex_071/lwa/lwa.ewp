@@ -209,7 +209,7 @@
                     <name>CCDefines</name>
                     <state>STM32L051xx</state>
                     <state>LOW_POWER_MODE_ENABLE</state>
-                    <state>USE_BAND_915_HYBRID</state>
+                    <state>USE_BAND_470</state>
                     <state>TMP006</state>
                     <state>MODE_OTA</state>
                     <state>USE_DEBUGGER</state>

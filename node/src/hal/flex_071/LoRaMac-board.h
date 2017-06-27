@@ -115,7 +115,7 @@ Description: LoRa MAC layer board dependent definitions
 /*!
  * LoRaMac maximum number of channels
  */
-#define LORA_MAX_NB_CHANNELS                        16
+#define LORA_MAX_NB_CHANNELS                        96
 
 /*!
  * Minimal datarate that can be used by the node
@@ -125,7 +125,7 @@ Description: LoRa MAC layer board dependent definitions
 /*!
  * Minimal datarate that can be used by the node
  */
-#define LORAMAC_MAX_DATARATE                        DR_7
+#define LORAMAC_MAX_DATARATE                        DR_5
 
 /*!
  * Default datarate used by the node
@@ -145,28 +145,29 @@ Description: LoRa MAC layer board dependent definitions
 /*!
  * Minimal Tx output power that can be used by the node
  */
-#define LORAMAC_MIN_TX_POWER                        TX_POWER_M5_DBM
+#define LORAMAC_MIN_TX_POWER                        TX_POWER_2_DBM
 
 /*!
  * Minimal Tx output power that can be used by the node
  */
-#define LORAMAC_MAX_TX_POWER                        TX_POWER_10_DBM
+#define LORAMAC_MAX_TX_POWER                        TX_POWER_17_DBM
 
 /*!
  * Default Tx output power used by the node
  */
-#define LORAMAC_DEFAULT_TX_POWER                    TX_POWER_10_DBM
+#define LORAMAC_DEFAULT_TX_POWER                    TX_POWER_14_DBM
 
 /*!
  * LoRaMac TxPower definition
  */
-#define TX_POWER_10_DBM                             0
-#define TX_POWER_07_DBM                             1
-#define TX_POWER_04_DBM                             2
-#define TX_POWER_01_DBM                             3
-#define TX_POWER_M2_DBM                             4
-#define TX_POWER_M5_DBM                             5
-
+#define TX_POWER_17_DBM                             0
+#define TX_POWER_16_DBM                             1
+#define TX_POWER_14_DBM                             2
+#define TX_POWER_12_DBM                             3
+#define TX_POWER_10_DBM                             4
+#define TX_POWER_7_DBM                              5
+#define TX_POWER_5_DBM                              6
+#define TX_POWER_2_DBM                              7   
 /*!
  * LoRaMac datarates definition
  */
@@ -176,14 +177,14 @@ Description: LoRa MAC layer board dependent definitions
 #define DR_3                                        3  // SF9  - BW125
 #define DR_4                                        4  // SF8  - BW125
 #define DR_5                                        5  // SF7  - BW125
-#define DR_6                                        6  // SF7  - BW250
-#define DR_7                                        7  // FSK
+//#define DR_6                                        6  // SF7  - BW250
+//#define DR_7                                        7  // FSK
 
 /*!
  * Second reception window channel definition.
  */
 // Channel = { Frequency [Hz], Datarate }
-#define RX_WND_2_CHANNEL                                  { 472990000, DR_0 }
+#define RX_WND_2_CHANNEL                                  { 505300000, DR_0 }
 
 /*!
  * LoRaMac maximum number of bands
@@ -191,15 +192,12 @@ Description: LoRa MAC layer board dependent definitions
 #define LORA_MAX_NB_BANDS                           1
 
 // Band = { DutyCycle, TxMaxPower, LastTxDoneTime, TimeOff }
-#define BAND0              { 100, TX_POWER_10_DBM, 0,  0 } //  1.0 %
+#define BAND0              { 100, TX_POWER_14_DBM, 0,  0 } //  1.0 %
 
 /*!
  * LoRaMac default channels
  */
 // Channel = { Frequency [Hz], { ( ( DrMax << 4 ) | DrMin ) }, Band }
-#define LC1                { 471500000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
-#define LC2                { 471700000, { ( ( DR_7 << 4 ) | DR_0 ) }, 0 }
-#define LC3                { 471900000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
 
 #elif defined( USE_BAND_780 )
 

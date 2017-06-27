@@ -18,7 +18,7 @@ Description: LoRaWAW Class A/C Example
 #define APP_PORT                                        (2)
 #define APP_DATA_SIZE                                   (8)
 
-#define APP_TX_DUTYCYCLE                                (90000000)     // min
+#define APP_TX_DUTYCYCLE                                (20000000)     // min
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
 
 

@@ -68,20 +68,7 @@ Description: loramac-node board dependent definitions
 /*!
  * Board MCU pins definitions
  */
-#if defined(STM32L052xx)
-#define RADIO_RESET                                 PB_11
-
-#define RADIO_DIO_0                                 PB_10
-#define RADIO_DIO_1                                 PB_2
-#define RADIO_DIO_2                                 PB_0
-#define RADIO_DIO_3                                 PB_1
-#define RADIO_DIO_4                                 NC
-#define RADIO_DIO_5                                 NC
-
-#define RADIO_ANT_SWITCH_RXTX1	                    PA_1
-#define RADIO_ANT_SWITCH_RXTX2                      PA_2
-
-#elif defined(STM32L071xx)
+#ifdef FREQ_915M
 
 #define RADIO_RESET                                 PB_1
 
@@ -94,7 +81,7 @@ Description: loramac-node board dependent definitions
 
 #define RADIO_ANT_SWITCH_RXTX1	                    PB_4
 #define RADIO_ANT_SWITCH_RXTX2                      PB_5
-#endif
+
 
 #define BAT_LEVEL_PIN                               PA_1
 #define BAT_LEVEL_CHANNEL                           ADC_CHANNEL_1
@@ -111,6 +98,36 @@ Description: loramac-node board dependent definitions
 #define SWCLK                                       PA_14
 
 #define LED                                         PA_0
+#elif defined FREQ_470M
+#define RADIO_RESET                                 PB_1
+
+#define RADIO_DIO_0                                 PA_8
+#define RADIO_DIO_1                                 PA_0
+#define RADIO_DIO_2                                 PA_10
+#define RADIO_DIO_3                                 PA_11
+#define RADIO_DIO_4                                 PA_12
+#define RADIO_DIO_5                                 PA_15
+
+#define RADIO_ANT_SWITCH_RXTX1	                    PB_2
+#define RADIO_ANT_SWITCH_RXTX2                      PB_3
+
+
+#define BAT_LEVEL_PIN                               PA_1
+#define BAT_LEVEL_CHANNEL                           ADC_CHANNEL_1
+
+#define I2C_SCL                                     PB_10
+#define I2C_SDA                                     PB_11
+
+#define RADIO_MOSI                                  PA_7
+#define RADIO_MISO                                  PA_6
+#define RADIO_SCLK                                  PA_5
+#define RADIO_NSS                                   PA_4
+
+#define SWDIO                                       PA_13
+#define SWCLK                                       PA_14
+
+#define LED                                         PB_13
+#endif
 /*!
  * \brief Initializes the target board peripherals.
  */

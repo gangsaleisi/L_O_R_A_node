@@ -22,9 +22,11 @@ extern Gpio_t Led;
 #define RF_FREQUENCY                                868000000 // Hz
 
 #elif defined( USE_BAND_915_HYBRID )
-
+#ifdef FREQ_915M
 #define RF_FREQUENCY                                940000000 // Hz
-
+#elif defined FREQ_470M
+#define RF_FREQUENCY                                470000000 // Hz
+#endif
 #endif
 
 #define TX_OUTPUT_POWER                             14        // dBm
@@ -139,7 +141,7 @@ int main( void )
 
 
     Radio.Rx( RX_TIMEOUT_VALUE );
-
+    GpioWrite( &Led, 1 ); 
     while( 1 )
     {
         switch( State )

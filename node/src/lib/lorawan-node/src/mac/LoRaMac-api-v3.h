@@ -77,7 +77,7 @@
  * receiving an acknowledge.
  * AckTimeout = ACK_TIMEOUT + Random( -ACK_TIMEOUT_RND, ACK_TIMEOUT_RND )
  */
-#define ACK_TIMEOUT                                 7000000
+#define ACK_TIMEOUT                                 5000000
 
 /*!
  * Random number of seconds after the start of the second reception window without

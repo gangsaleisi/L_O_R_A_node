@@ -18,11 +18,13 @@ float get_sensor_value()
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
+    Tmp006Write(CONF_REG, "7500", 2);
     while (i--)
     {
       vamb += Tmp006SensorI2c();
     }
     vamb = vamb/3;
+    Tmp006Write(CONF_REG, "0500", 2);
 #else
     //todo
 #endif
@@ -71,7 +73,8 @@ float Tmp006SensorI2c( void )
     float b1 = -5.7*pow(10,-7);  
     float b2 = 4.63*pow(10,-9);  
     float c2 = 13.4; 
-
+    
+    
     //read local temperature
     Tmp006Read( TEMP_REG, tempBuf, 2 );
     Tdie_Temp = ((tempBuf[0] << 8) +  tempBuf[1]);

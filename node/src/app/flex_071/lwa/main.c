@@ -18,7 +18,7 @@ Description: LoRaWAW Class A/C Example
 #define APP_PORT                                        (2)
 #define APP_DATA_SIZE                                   (8)
 
-#define APP_TX_DUTYCYCLE                                (20000000)     // min
+#define APP_TX_DUTYCYCLE                                (30000000)     // min
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
 
 
@@ -35,6 +35,7 @@ extern Gpio_t Led;
 
 uint8_t loramac_evt_flag = 0;
 uint8_t loramac_join_flag = 0;
+uint8_t loramac_send_flag = 0;
 LoRaMacRxInfo *loramac_rx_info;
 lm_evt_t loramac_evt;
 
@@ -103,6 +104,7 @@ int main( void )
             }
             else
             {
+              loramac_send_flag = 0;
               sprintf((char *)AppData, "%8.2f", (double)get_sensor_value());
               //jason
               //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
@@ -128,9 +130,15 @@ int main( void )
             __enable_irq();
 
             sys_sta = SYS_STA_IDLE;
-
             ReportTimerEvent = false;
-            TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+            if(loramac_send_flag != 1)
+            {
+              TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+            }
+            else
+            {
+              TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE_RND );
+            }
             TimerStart( &ReportTimer );
         }
 

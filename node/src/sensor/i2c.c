@@ -32,8 +32,8 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
   /* USER CODE END I2C1_MspInit 0 */
   
     /**I2C1 GPIO Configuration    
-    PB6     ------> I2C1_SCL
-    PB7     ------> I2C1_SDA 
+    PB10     ------> I2C1_SCL
+    PB11     ------> I2C1_SDA 
     */
     GPIO_InitStruct.Pin = GPIO_PIN_10|GPIO_PIN_11; //Donny
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;

@@ -15,8 +15,7 @@ Description: LoRaMac-Node application file
 #include "LoRaMac-api-v3.h"
 
 lm_callback_t lm_callback_g;
-//jason
-#define LOAD_VALUE      0x10
+#define LOAD_VALUE      0x20
 static uint8_t DevEui[] = {
     0x46, 0x4c, 0x45, 0x58, 0x01, 0x01, 0x00, 0x00
 };
@@ -42,6 +41,7 @@ LoRaMacRxInfo RxInfo;
 LoRaMode_t Mode = ABP;
 uint8_t FlashArray[41] = {0};
 extern uint8_t loramac_join_flag;
+extern uint8_t loramac_send_flag;
 void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
 {
     switch( info->Status ){
@@ -71,6 +71,7 @@ void OnMacEvent( LoRaMacEventFlags_t *flags, LoRaMacEventInfo_t *info )
         //Flash_If_Write(FlashArray, (uint8_t *)USBD_DFU_APP_DEFAULT_ADD, 40*4);
         LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
         loramac_join_flag = 1;
+        loramac_send_flag = 1;
         //memset(FlashArray, 0x00, sizeof(FlashArray));
         //Flash_If_Read((uint8_t *)USBD_DFU_APP_DEFAULT_ADD, FlashArray, 40);
 #endif
@@ -158,6 +159,7 @@ void app_lm_para_init(void)
           memcpy(AppSKey, FlashArray+24,sizeof(AppSKey));
           LoRaMacInitNwkIds( 0x000000, DevAddr, NwkSKey, AppSKey );
           loramac_join_flag = 1;
+          //loramac_send_flag = 1;
         }
     }
 }

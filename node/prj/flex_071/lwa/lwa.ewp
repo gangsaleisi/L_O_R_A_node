@@ -212,6 +212,7 @@
                     <state>USE_BAND_470</state>
                     <state>TMP006</state>
                     <state>MODE_OTA</state>
+                    <state>USE_DEBUGGER</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

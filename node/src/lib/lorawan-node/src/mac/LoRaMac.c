@@ -183,7 +183,7 @@ static uint8_t MacCommandsBufferIndex = 0;
  */
 static uint8_t MacCommandsBuffer[LORA_MAC_COMMAND_MAX_LENGTH];
 
-#if defined( USE_BAND_433 ) //|| defined( USE_BAND_470) 
+#if defined( USE_BAND_433 ) 
 /*!
  * Data rates table definition
  */
@@ -1385,7 +1385,7 @@ static void OnMacStateCheckTimerEvent( void )
             }
             else
             {
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
                 // Re-enable default channels LC1, LC2, LC3
                 ChannelsMask[0] = ChannelsMask[0] | ( LC( 1 ) + LC( 2 ) + LC( 3 ) );
 #elif defined( USE_BAND_915 )
@@ -1510,10 +1510,10 @@ static void OnRxWindow1TimerEvent( void )
     { // DR_1, DR_2, DR_3, DR_4, DR_8, DR_9, DR_10, DR_11, DR_12, DR_13
         symbTimeout = 8;
     }
-    if( datarate >= DR_4 )
-    {// LoRa 500 kHz
-        bandwidth  = 2;
-    }
+    //if( datarate >= DR_4 )
+    //{// LoRa 500 kHz
+    //    bandwidth  = 2;
+    //}
     RxWindowSetup( 500.3e6 + ( Channel % 48 ) * 200e3, datarate, bandwidth, symbTimeout, false );
 #elif ( defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) )
     datarate = datarateOffsets[ChannelsDatarate][Rx1DrOffset];
@@ -1544,7 +1544,7 @@ static void OnRxWindow2TimerEvent( void )
     TimerStop( &RxWindowTimer2 );
     RxSlot = 1;
 
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
     // For higher datarates, we increase the number of symbols generating a Rx Timeout
     if( Rx2Channel.Datarate >= DR_3 )
     { // DR_6, DR_5, DR_4, DR_3
@@ -1554,7 +1554,7 @@ static void OnRxWindow2TimerEvent( void )
     {// LoRa 250 kHz
         bandwidth  = 1;
     }
-#elif ( defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) || defined( USE_BAND_470 ))
+#elif ( defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) )
     // For higher datarates, we increase the number of symbols generating a Rx Timeout
     if( Rx2Channel.Datarate > DR_0 )
     { // DR_1, DR_2, DR_3, DR_4, DR_8, DR_9, DR_10, DR_11, DR_12, DR_13
@@ -1564,6 +1564,16 @@ static void OnRxWindow2TimerEvent( void )
     {// LoRa 500 kHz
         bandwidth  = 2;
     }
+#elif defined( USE_BAND_470 )
+    // For higher datarates, we increase the number of symbols generating a Rx Timeout
+    if( Rx2Channel.Datarate > DR_0 )
+    { // DR_1, DR_2, DR_3, DR_4, DR_8, DR_9, DR_10, DR_11, DR_12, DR_13
+        symbTimeout = 8;
+    }
+    //if( Rx2Channel.Datarate >= DR_4 )
+    //{// LoRa 500 kHz
+   //     bandwidth  = 2;
+   // }
 #else
     #error "Please define a frequency band in the compiler options."
 #endif
@@ -1756,7 +1766,7 @@ static void RxWindowSetup( uint32_t freq, int8_t datarate, uint32_t bandwidth, u
         // Store downlink datarate
         McpsIndication.RxDatarate = ( uint8_t ) datarate;
 
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
         if( datarate == DR_7 )
         {
             modem = MODEM_FSK;
@@ -1927,7 +1937,7 @@ static bool AdrNextDr( bool adrEnabled, bool updateChannelMask, int8_t* datarate
             {
                 if( ( ( AdrAckCounter - ADR_ACK_DELAY ) % ADR_ACK_LIMIT ) == 0 )
                 {
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
                     if( datarate > LORAMAC_MIN_DATARATE )
                     {
                         datarate--;
@@ -2134,7 +2144,7 @@ static void ProcessMacCommands( uint8_t *payload, uint8_t macIndex, uint8_t comm
                     {
                         nbRep = 1;
                     }
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
                     if( ( chMaskCntl == 0 ) && ( chMask == 0 ) )
                     {
                         status &= 0xFE; // Channel mask KO
@@ -2501,7 +2511,7 @@ static LoRaMacStatus_t ScheduleTx( )
         // Set the default datarate
         ChannelsDatarate = ChannelsDefaultDatarate;
 
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
         // Re-enable default channels LC1, LC2, LC3
         ChannelsMask[0] = ChannelsMask[0] | ( LC( 1 ) + LC( 2 ) + LC( 3 ) );
 #endif
@@ -2686,7 +2696,7 @@ LoRaMacStatus_t SendFrameOnChannel( ChannelParams_t channel )
 
     Radio.SetChannel( channel.Frequency );
 
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
     if( ChannelsDatarate == DR_7 )
     { // High Speed FSK channel
         Radio.SetMaxPayloadLength( MODEM_FSK, LoRaMacBufferPktLen );
@@ -2706,7 +2716,7 @@ LoRaMacStatus_t SendFrameOnChannel( ChannelParams_t channel )
         Radio.SetTxConfig( MODEM_LORA, txPower, 0, 0, datarate, 1, 8, false, true, 0, 0, false, 3e6 );
         TxTimeOnAir = Radio.TimeOnAir( MODEM_LORA, LoRaMacBufferPktLen );
     }
-#elif defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) || defined( USE_BAND_470 )
+#elif defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) 
     Radio.SetMaxPayloadLength( MODEM_LORA, LoRaMacBufferPktLen );
     if( ChannelsDatarate >= DR_4 )
     { // High speed LoRa channel BW500 kHz
@@ -2718,6 +2728,10 @@ LoRaMacStatus_t SendFrameOnChannel( ChannelParams_t channel )
         Radio.SetTxConfig( MODEM_LORA, txPower, 0, 0, datarate, 1, 8, false, true, 0, 0, false, 3e6 );
         TxTimeOnAir = Radio.TimeOnAir( MODEM_LORA, LoRaMacBufferPktLen );
     }
+#elif defined( USE_BAND_470 )
+    Radio.SetMaxPayloadLength( MODEM_LORA, LoRaMacBufferPktLen );
+    Radio.SetTxConfig( MODEM_LORA, txPower, 0, 0, datarate, 1, 8, false, true, 0, 0, false, 3e6 );
+    TxTimeOnAir = Radio.TimeOnAir( MODEM_LORA, LoRaMacBufferPktLen );
 #else
     #error "Please define a frequency band in the compiler options."
 #endif
@@ -2768,7 +2782,7 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t *primitives, LoRaMacC
     IsLoRaMacNetworkJoined = false;
     LoRaMacState = MAC_IDLE;
 
-#if defined( USE_BAND_433 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 )
     ChannelsMask[0] = LC( 1 ) + LC( 2 ) + LC( 3 );
 #elif defined( USE_BAND_780 )
     ChannelsMask[0] = LC( 1 ) + LC( 2 ) + LC( 3 );
@@ -2839,7 +2853,7 @@ LoRaMacStatus_t LoRaMacInitialization( LoRaMacPrimitives_t *primitives, LoRaMacC
     AggregatedLastTxDoneTime = 0;
     AggregatedTimeOff = 0;
 
-#if defined( USE_BAND_433 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) 
     DutyCycleOn = false;
 #elif defined( USE_BAND_780 )
     DutyCycleOn = false;
@@ -3309,7 +3323,7 @@ LoRaMacStatus_t LoRaMacChannelAdd( uint8_t id, ChannelParams_t params )
         datarateInvalid = true;
     }
 
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 )// || defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 )
     if( id < 3 )
     {
         if( params.Frequency != Channels[id].Frequency )
@@ -3387,7 +3401,7 @@ LoRaMacStatus_t LoRaMacChannelAdd( uint8_t id, ChannelParams_t params )
 
 LoRaMacStatus_t LoRaMacChannelRemove( uint8_t id )
 {
-#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) //|| defined( USE_BAND_470 )
+#if defined( USE_BAND_433 ) || defined( USE_BAND_780 ) || defined( USE_BAND_868 ) 
     if( ( LoRaMacState & MAC_TX_RUNNING ) == MAC_TX_RUNNING )
     {
         if( ( LoRaMacState & MAC_TX_CONFIG ) != MAC_TX_CONFIG )
@@ -3557,7 +3571,11 @@ LoRaMacStatus_t LoRaMacMlmeRequest( MlmeReq_t *mlmeRequest )
             }
             else
             {
+#if defined( USE_BAND_470 )
+                ChannelsDatarate = DR_1;
+#else
                 ChannelsDatarate = DR_4;
+#endif
             }
 #endif
 

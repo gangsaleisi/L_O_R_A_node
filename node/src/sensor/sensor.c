@@ -65,7 +65,7 @@ float Tmp006SensorI2c( void )
     float Tdie;  
     
     float S,Vos,fVobj;  
-    float S0 = 6.4*pow(10,-14);  
+    float S0 = 5.4*pow(10,-14);  
     float a1 = 1.75*pow(10,-3);  
     float a2 = -1.678*pow(10,-5);  
     float Tref = 298.15;  
@@ -108,10 +108,10 @@ float Tmp006SensorI2c( void )
     Tobj = sqrt(sqrt(pow(Tdie,4) + fVobj/S));  
     Tobj -= 273.15; 
     //compensate
-    if (Tobj >= 30)
-      Tobj += 1.3;
-    else if (Tobj < 30 && Tobj > 20)
-      Tobj += 0.8;
+    //if (Tobj >= 30)
+    //  Tobj += 1.3;
+    //else if (Tobj < 30 && Tobj > 20)
+    //  Tobj += 0.8;
     return( Tobj );
 }
 

@@ -97,7 +97,7 @@ void BoardInitMcu( void )
     MX_GPIO_Init();
     MX_I2C1_Init();
 #endif
-    AdcInit( &Adc, BAT_LEVEL_PIN );
+    //AdcInit( &Adc, BAT_LEVEL_PIN );
     Flash_If_Init();
 #if USE_DEBUGGER
     /* Enable debug under stop mode */
@@ -112,7 +112,7 @@ void BoardDeInitMcu( void )
 #if defined( TMP006 )
     MX_I2C1_DeInit();
 #endif
-    AdcDeInit( &Adc );
+    //AdcDeInit( &Adc );
     Flash_If_DeInit();
     SpiDeInit( &SX1276.Spi );
     SX1276IoDeInit( );
@@ -153,19 +153,22 @@ uint8_t BoardMeasureBatterieLevel( void )
 
 static void BoardUnusedIoInit( void )
 {
-    GpioInit( &UnUsed, UNUSED_1, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_2, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_3, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_4, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_5, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_6, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_7, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_8, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_9, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_10, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_11, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_12, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_13, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_1, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_2, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_3, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_4, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_5, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_6, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_7, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_8, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_9, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_10, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_11, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_12, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_13, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    
+    GpioInit( &UnUsed, BAT_LEVEL_PIN, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    
 }
 #ifdef TMP006
 static void MX_GPIO_Init(void)

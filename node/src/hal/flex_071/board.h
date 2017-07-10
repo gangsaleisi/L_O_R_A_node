@@ -93,7 +93,7 @@ Description: loramac-node board dependent definitions
 #define UNUSED_4                                    PA_9
 #define UNUSED_5                                    PB_9
 #define UNUSED_6                                    PB_12
-#define UNUSED_7                                    PB_13
+#define UNUSED_7                                    PB_15
 #define UNUSED_8                                    PB_0
 #define UNUSED_9                                    PB_14
 #define UNUSED_10                                   PB_4

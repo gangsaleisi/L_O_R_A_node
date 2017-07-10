@@ -221,8 +221,8 @@ void SystemInit (void)
 void SystemCoreClockUpdate (void)
 {
   uint32_t tmp = 0, pllmul = 0, plldiv = 0, pllsource = 0, msirange = 0, hsidiv = 0;
- RCC_ClkInitTypeDef RCC_ClkInitStruct;
-  RCC_PeriphCLKInitTypeDef PeriphClkInit;
+ //RCC_ClkInitTypeDef RCC_ClkInitStruct;
+ // RCC_PeriphCLKInitTypeDef PeriphClkInit;
   /* Get SYSCLK source -------------------------------------------------------*/
   tmp = RCC->CFGR & RCC_CFGR_SWS;
   
@@ -268,6 +268,7 @@ void SystemCoreClockUpdate (void)
       SystemCoreClock = (32768 * (1 << (msirange + 1)));
       break;
   }
+#if 0
   /* Compute HCLK clock frequency --------------------------------------------*/
   /* Get HCLK prescaler */
   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
@@ -295,6 +296,7 @@ void SystemCoreClockUpdate (void)
 
    // SysTick_IRQn interrupt configuration
    HAL_NVIC_SetPriority( SysTick_IRQn, 0, 0 );
+#endif
 }
 
 

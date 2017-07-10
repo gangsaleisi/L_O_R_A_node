@@ -70,21 +70,22 @@ int main( void )
     BoardInitPeriph( );
     
     
-    app_lm_init(app_lm_cb);
+   // app_lm_init(app_lm_cb);
 #ifdef MODE_OTA
-    app_lm_para_init();
+   // app_lm_para_init();
 #endif
     /* Uncomment below line to enable class C mode */
 #ifdef CLASS_TYPE_C
-    LoRaMacSetDeviceClass(CLASS_C);
+   // LoRaMacSetDeviceClass(CLASS_C);
 #endif
-    TimerInit( &ReportTimer, OnReportTimerEvent );
-    ReportTimerEvent = true;
+   // TimerInit( &ReportTimer, OnReportTimerEvent );
+   // ReportTimerEvent = true;
 #ifndef USE_DEBUGGER
     DelayMs( 10000 );
 #endif
-    while( 1 )
-    {
+  //  while( 1 )
+   // {
+#if 0
         switch(sys_sta){
         case SYS_STA_IDLE:
             if(ReportTimerEvent == true){
@@ -133,8 +134,11 @@ int main( void )
             TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
             TimerStart( &ReportTimer );
         }
-
-        TimerLowPowerHandler( );
+#endif
+         RtcEnterLowPowerStopMode( );
+        //TimerLowPowerHandler( );
+        while(1)
+        {
     }
 }
 

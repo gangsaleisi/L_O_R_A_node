@@ -212,7 +212,6 @@
                     <state>USE_BAND_915_HYBRID</state>
                     <state>MCP9700</state>
                     <state>MODE_OTA</state>
-                    <state>USE_DEBUGGER</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

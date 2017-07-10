@@ -312,7 +312,7 @@ static void RtcClearStatus( void )
 
 void RtcEnterLowPowerStopMode( void )
 {
-    if( ( LowPowerDisableDuringTask == false ) && ( RtcTimerEventAllowsLowPower == true ) )
+   // if( ( LowPowerDisableDuringTask == false ) && ( RtcTimerEventAllowsLowPower == true ) )
     {
         /** disable irq */
         __disable_irq( );

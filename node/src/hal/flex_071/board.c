@@ -76,14 +76,14 @@ void BoardInitMcu( void )
         SystemClock_Config();
         SystemCoreClockUpdate();
         
-        GpioInit( &Led, LED, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
+        //GpioInit( &Led, LED, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
         
         // Disable Systick
         SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk;    // Systick IRQ off
         SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;            // Clear SysTick Exception pending flag
 
-        SpiInit( &SX1276.Spi, RADIO_MOSI, RADIO_MISO, RADIO_SCLK, NC );
-        SX1276IoInit( );
+        //SpiInit( &SX1276.Spi, RADIO_MOSI, RADIO_MISO, RADIO_SCLK, NC );
+        //SX1276IoInit( );
 
         TimerSetLowPowerEnable( true );
         RtcInit( );
@@ -97,8 +97,8 @@ void BoardInitMcu( void )
     MX_GPIO_Init();
     MX_I2C1_Init();
 #endif
-    AdcInit( &Adc, BAT_LEVEL_PIN );
-    Flash_If_Init();
+   // AdcInit( &Adc, BAT_LEVEL_PIN );
+   // Flash_If_Init();
 #if USE_DEBUGGER
     /* Enable debug under stop mode */
     RCC->APB2ENR |= RCC_APB2ENR_DBGMCUEN;
@@ -112,10 +112,10 @@ void BoardDeInitMcu( void )
 #if defined( TMP006 )
     MX_I2C1_DeInit();
 #endif
-    AdcDeInit( &Adc );
-    Flash_If_DeInit();
-    SpiDeInit( &SX1276.Spi );
-    SX1276IoDeInit( );
+  //  AdcDeInit( &Adc );
+  //  Flash_If_DeInit();
+    //SpiDeInit( &SX1276.Spi );
+   // SX1276IoDeInit( );
 
     McuInitialized = false;
 
@@ -123,8 +123,8 @@ void BoardDeInitMcu( void )
     {
         Gpio_t Swdio;
         Gpio_t Swclk;
-        GpioInit( &Swdio, SWDIO, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-        GpioInit( &Swclk, SWCLK, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
+        GpioInit( &Swdio, SWDIO, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
+        GpioInit( &Swclk, SWCLK, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
     }
 #endif
 }
@@ -153,19 +153,40 @@ uint8_t BoardMeasureBatterieLevel( void )
 
 static void BoardUnusedIoInit( void )
 {
-    GpioInit( &UnUsed, UNUSED_1, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_2, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_3, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_4, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_5, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_6, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_7, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_8, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_9, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_10, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_11, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_12, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
-    GpioInit( &UnUsed, UNUSED_13, PIN_INPUT, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_1, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_2, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_3, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_4, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_5, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_6, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_7, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_8, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    //GpioInit( &UnUsed, UNUSED_9, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+   // GpioInit( &UnUsed, UNUSED_10, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+   // GpioInit( &UnUsed, UNUSED_11, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_12, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_13, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+      GpioInit( &UnUsed, UNUSED_14, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_15, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_16, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, UNUSED_17, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    
+    GpioInit( &UnUsed, RADIO_DIO_0, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_DIO_1, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_DIO_2, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_DIO_3, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_DIO_4, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_DIO_5, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_ANT_SWITCH_RXTX1, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_ANT_SWITCH_RXTX2, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    
+    GpioInit( &UnUsed, RADIO_MOSI, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_MOSI, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_MOSI, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, RADIO_MOSI, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    
+    GpioInit( &UnUsed, LED, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
+    GpioInit( &UnUsed, BAT_LEVEL_PIN, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 ); 
 }
 #ifdef TMP006
 static void MX_GPIO_Init(void)

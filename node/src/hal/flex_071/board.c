@@ -68,7 +68,7 @@ void BoardInitPeriph( void )
 {
 
 }
-
+void SystemPower_Config(void);
 void BoardInitMcu( void )
 {
     if( McuInitialized == false )
@@ -105,6 +105,7 @@ void BoardInitMcu( void )
     DBGMCU->CR |= DBGMCU_CR_DBG_STOP | DBGMCU_CR_DBG_STANDBY | DBGMCU_CR_DBG_SLEEP;
     DBGMCU->APB1FZ |= DBGMCU_APB1_FZ_DBG_RTC_STOP;
 #endif
+
 }
 
 void BoardDeInitMcu( void )
@@ -127,6 +128,7 @@ void BoardDeInitMcu( void )
         GpioInit( &Swclk, SWCLK, PIN_ANALOGIC, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
     }
 #endif
+        SystemPower_Config();
 }
 
 void BoardGetUniqueId( uint8_t *id )
@@ -187,6 +189,54 @@ static void BoardUnusedIoInit( void )
     
     GpioInit( &UnUsed, LED, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 );
     GpioInit( &UnUsed, BAT_LEVEL_PIN, PIN_ANALOGIC, PIN_OPEN_DRAIN, PIN_NO_PULL, 0 ); 
+}
+void SystemPower_Config(void)
+{
+  GPIO_InitTypeDef GPIO_InitStructure;
+
+  /* Enable Power Control clock */
+  __HAL_RCC_PWR_CLK_ENABLE();
+
+  /* Enable Ultra low power mode */
+  HAL_PWREx_EnableUltraLowPower();
+  
+  /* Enable the fast wake up from Ultra low power mode */
+  HAL_PWREx_EnableFastWakeUp();
+
+  /* Select MSI as system clock source after Wake Up from Stop mode */
+  __HAL_RCC_WAKEUPSTOP_CLK_CONFIG(RCC_STOP_WAKEUPCLOCK_HSI);
+  
+  /* Enable GPIOs clock */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+
+  /* Configure all GPIO port pins in Analog Input mode (floating input trigger OFF) */
+  /* Note: Debug using ST-Link is not possible during the execution of this   */
+  /*       example because communication between ST-link and the device       */
+  /*       under test is done through UART. All GPIO pins are disabled (set   */
+  /*       to analog input mode) including  UART I/O pins.           */
+  GPIO_InitStructure.Pin = GPIO_PIN_All;
+  GPIO_InitStructure.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStructure.Pull = GPIO_NOPULL;
+
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStructure); 
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);
+  HAL_GPIO_Init(GPIOH, &GPIO_InitStructure);
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStructure);
+
+  /* Disable GPIOs clock */
+  __HAL_RCC_GPIOA_CLK_DISABLE();
+  __HAL_RCC_GPIOB_CLK_DISABLE();
+  __HAL_RCC_GPIOC_CLK_DISABLE();
+  __HAL_RCC_GPIOD_CLK_DISABLE();
+  __HAL_RCC_GPIOH_CLK_DISABLE();
+  __HAL_RCC_GPIOE_CLK_DISABLE();
 }
 #ifdef TMP006
 static void MX_GPIO_Init(void)

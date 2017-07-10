@@ -322,7 +322,12 @@ void RtcEnterLowPowerStopMode( void )
 
         /* Enable PWR clock */
         RCC->APB1ENR |= (uint32_t)(RCC_APB1ENR_PWREN);
+        /////////////////
 
+        /* Regulator is in low power mode */
+        PWR->CR &= (uint32_t)(~PWR_CR_LPSDSR);
+        
+        PWR->CR |= PWR_CR_LPSDSR;
         /* Set SLEEPDEEP bit of Cortex System Control Register */
         SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
@@ -336,22 +341,22 @@ void RtcEnterLowPowerStopMode( void )
         PWR->CR |= PWR_CR_ULP;
 
         /*Enable fast wakeUp*/
-        PWR->CR |= (uint32_t)(PWR_CR_FWU);
+       PWR->CR |= (uint32_t)(PWR_CR_FWU);
 
         /* Enter Stop mode(not standby mode) when mcu enters deepsleep */
         PWR->CR &= (uint32_t)(~PWR_CR_PDDS);
-
+        
         /* Regulator is in low power mode */
         PWR->CR |= PWR_CR_LPSDSR;
 
         /* Request Wait For Interrupt */
-        __WFI();
+       __WFI();
 
         /** enable irq */
         __enable_irq( );
 
         /* Reset SLEEPDEEP bit of Cortex System Control Register */
-        SCB->SCR &= (uint32_t)~((uint32_t)SCB_SCR_SLEEPDEEP_Msk);
+       SCB->SCR &= (uint32_t)~((uint32_t)SCB_SCR_SLEEPDEEP_Msk);
     }
 }
 

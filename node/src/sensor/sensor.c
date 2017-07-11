@@ -52,6 +52,9 @@ uint16_t Mcp97SensorAdc()
 #elif defined( TMP006 )
 uint8_t tempBuf[3];
 float Tobj;
+uint8_t default_config[2] = {0x75, 0x00};
+uint8_t global_obj[3];
+uint8_t global_local[3];
 float Tmp006SensorI2c( void )
 {
     uint16_t Tdie_Temp, Vobj_Read;
@@ -59,7 +62,7 @@ float Tmp006SensorI2c( void )
     float Tdie;  
     
     float S,Vos,fVobj;  
-    float S0 = 5.4*pow(10,-14);  
+    float S0 = 6.4*pow(10,-14);  
     float a1 = 1.75*pow(10,-3);  
     float a2 = -1.678*pow(10,-5);  
     float Tref = 298.15;  
@@ -68,11 +71,14 @@ float Tmp006SensorI2c( void )
     float b2 = 4.63*pow(10,-9);  
     float c2 = 13.4; 
 
-    #if 0
-    //Tmp006Write( CONF_REG, conf_default, 2 );
-    //Tmp006Read( CONF_REG, tempBuf, 2 );
+    #if 1
+    Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
+    
+    Tmp006Write( CONF_REG, default_config, 2 );
+    Tmp006Read( CONF_REG, tempBuf, 2 );
     //read local temperature
     Tmp006Read( TEMP_REG, tempBuf, 2 );
+    memcpy(global_local, tempBuf, 2);
     Tdie_Temp = ((tempBuf[0] << 8) +  tempBuf[1]);
     if (Tdie_Temp >= 0x8000)  
 
@@ -85,6 +91,7 @@ float Tmp006SensorI2c( void )
 }
     //read sensor voltage
     Tmp006Read( SENSOR_REG, tempBuf, 2 );
+    memcpy(global_obj, tempBuf, 2);
     Vobj_Read  = (tempBuf[0] << 8) + tempBuf[1];
 
     if(Vobj_Read >= 0x8000)  
@@ -104,9 +111,8 @@ float Tmp006SensorI2c( void )
     Tobj = sqrt(sqrt(pow(Tdie,4) + fVobj/S));  
     Tobj -= 273.15;  
 #else
-    Tmp006Read( CONF_REG, tempBuf, 2 );
-    while(tempBuf[1] & 0x80 != 0x80);
     
+   
     Tmp006Read( TEMP_REG, tempBuf, 2 );
     Tdie = ((tempBuf[0] << 8) +  tempBuf[1]) * 0.0078125 + 273.15;
     

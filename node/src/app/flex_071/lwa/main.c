@@ -16,7 +16,7 @@ Description: LoRaWAW Class A/C Example
 #include "LoRaMac-api-v3.h"
 
 #define APP_PORT                                        (2)
-#define APP_DATA_SIZE                                   (8)
+#define APP_DATA_SIZE                                   (20)
 
 #define APP_TX_DUTYCYCLE                                (90000000)     // min
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
@@ -63,7 +63,8 @@ void app_lm_cb (lm_evt_t evt, void *msg)
         break;
     }
 }
-
+extern uint8_t global_local[];
+extern uint8_t global_obj[];
 int main( void )
 {
     BoardInitMcu( );
@@ -76,9 +77,9 @@ int main( void )
 #endif
     while(1)
     {
-      sprintf((char *)AppData, "%7f", (double)get_sensor_value());
-      AppData[7] = '\n';
-      SendData(AppData, 8);
+      sprintf((char *)AppData, "%f\t%x%x\t%x%x\n", (double)get_sensor_value(), global_local[0], global_local[1],global_obj[0],global_obj[1]);
+      AppData[19] = '\n';
+      SendData(AppData, 20);
       DelayMs( 1000 );
     }
     /* Uncomment below line to enable class C mode */

@@ -19,7 +19,6 @@ float get_sensor_value()
 
 #elif defined( TMP006 )
 #if 1
-      srand1( RAND_SEED );
       vamb += (float)randr(-1, 11)/10 + 32.0;
 #else
     Tmp006Write(CONF_REG, "7500", 2);

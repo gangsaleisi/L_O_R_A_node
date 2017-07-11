@@ -16,7 +16,7 @@ Adc_t Adc;
 Gpio_t Led;
 Gpio_t UnUsed;
 I2C_HandleTypeDef hi2c1;
-
+extern uint8_t powerdown_config[];
 static void BoardUnusedIoInit( void );
 #ifdef TMP006
 static void MX_GPIO_Init(void);
@@ -96,7 +96,7 @@ void BoardInitMcu( void )
 #if defined( TMP006 )
     MX_GPIO_Init();
     MX_I2C1_Init();
-    Tmp006Write(CONF_REG, "0500", 2);
+    Tmp006Write(CONF_REG, powerdown_config, 2);
 #endif
     //AdcInit( &Adc, BAT_LEVEL_PIN );
     Flash_If_Init();

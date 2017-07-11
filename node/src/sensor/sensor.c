@@ -9,6 +9,8 @@ Ta:ambient temperature
 V0:sensor output vlotage at 0
 mcp9700A:tc=10,v0=500
 */
+uint8_t default_config[2] = {0x75, 0x00};
+uint8_t powerdown_config[2] = {0x05, 0x00};
 float get_sensor_value()
 {
     float vamb = 0.0;
@@ -18,17 +20,17 @@ float get_sensor_value()
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
-#if 1
+#if 0
       vamb += (float)randr(-1, 11)/10 + 32.0;
 #else
-    Tmp006Write(CONF_REG, "7500", 2);
+    Tmp006Write(CONF_REG, default_config, 2);
     while (i--)
     {
       vamb += Tmp006SensorI2c();
     }
     vamb = vamb/3;
 #endif
-    Tmp006Write(CONF_REG, "0500", 2);
+    Tmp006Write(CONF_REG, powerdown_config, 2);
 #else
     //todo
 #endif
@@ -69,7 +71,7 @@ float Tmp006SensorI2c( void )
     float Tdie;  
     
     float S,Vos,fVobj;  
-    float S0 = 5.4*pow(10,-14);  
+    float S0 = 6.4*pow(10,-14);  
     float a1 = 1.75*pow(10,-3);  
     float a2 = -1.678*pow(10,-5);  
     float Tref = 298.15;  

@@ -15,7 +15,7 @@ Description: LoRaMac-Node application file
 #include "LoRaMac-api-v3.h"
 
 lm_callback_t lm_callback_g;
-#define LOAD_VALUE      0x44
+#define LOAD_VALUE      0x5
 static uint8_t DevEui[] = {
     0x46, 0x4c, 0x45, 0x58, 0x01, 0x01, 0x00, 0x00
 };
@@ -117,7 +117,7 @@ void app_lm_init(lm_callback_t cb)
     LoRaMacInit( &LoRaMacCallbacks );
 
     // Random seed initialization
-    srand1( RAND_SEED );
+    //srand1( RAND_SEED );
     // Choose a random device address
     // NwkID = 0
     // NwkAddr rand [0, 33554431]

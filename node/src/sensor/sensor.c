@@ -18,12 +18,17 @@ float get_sensor_value()
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
+#if 1
+      srand1( RAND_SEED );
+      vamb += (float)randr(-1, 11)/10 + 32.0;
+#else
     Tmp006Write(CONF_REG, "7500", 2);
     while (i--)
     {
       vamb += Tmp006SensorI2c();
     }
     vamb = vamb/3;
+#endif
     Tmp006Write(CONF_REG, "0500", 2);
 #else
     //todo

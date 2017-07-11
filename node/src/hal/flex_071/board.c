@@ -10,7 +10,7 @@ Description: loramac-node board level functions
 
 */
 #include "board.h"
-
+#include "sensor.h"
 static bool McuInitialized = false;
 Adc_t Adc;
 Gpio_t Led;
@@ -96,6 +96,7 @@ void BoardInitMcu( void )
 #if defined( TMP006 )
     MX_GPIO_Init();
     MX_I2C1_Init();
+    Tmp006Write(CONF_REG, "0500", 2);
 #endif
     //AdcInit( &Adc, BAT_LEVEL_PIN );
     Flash_If_Init();

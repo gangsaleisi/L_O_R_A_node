@@ -79,6 +79,7 @@ int main( void )
 #ifdef CLASS_TYPE_C
     LoRaMacSetDeviceClass(CLASS_C);
 #endif
+    get_sensor_value();
     TimerInit( &ReportTimer, OnReportTimerEvent );
     ReportTimerEvent = true;
 #ifndef USE_DEBUGGER

@@ -14,6 +14,7 @@ Description: LoRaWAW Class A/C Example
 #include "LoRaMac.h"
 #include "app-lm.h"
 #include "LoRaMac-api-v3.h"
+#include "sensor.h"
 
 #define APP_PORT                                        (2)
 #define APP_DATA_SIZE                                   (20)
@@ -65,6 +66,7 @@ void app_lm_cb (lm_evt_t evt, void *msg)
 }
 extern uint8_t global_local[];
 extern uint8_t global_obj[];
+uint8_t powerdown_config[2] = {0x05, 0x00};
 int main( void )
 {
     BoardInitMcu( );
@@ -75,9 +77,11 @@ int main( void )
 #ifdef MODE_OTA
     app_lm_para_init();
 #endif
+    Tmp006Write( CONF_REG, powerdown_config, 2 );
     while(1)
     {
       sprintf((char *)AppData, "%f\t%x%x\t%x%x\n", (double)get_sensor_value(), global_local[0], global_local[1],global_obj[0],global_obj[1]);
+      Tmp006Write( CONF_REG, powerdown_config, 2 );
       AppData[19] = '\n';
       SendData(AppData, 20);
       DelayMs( 1000 );

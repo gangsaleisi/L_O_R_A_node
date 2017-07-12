@@ -112,10 +112,13 @@ float Tmp006SensorI2c( void )
     Tobj -= 273.15;  
 #else
     
-   Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
+   //Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
     
     Tmp006Write( CONF_REG, default_config, 2 );
-    Tmp006Read( CONF_REG, tempBuf, 2 );
+    do 
+    {
+      Tmp006Read( CONF_REG, tempBuf, 2 );
+    }while((tempBuf[1]&0x80) != 0x80);
     Tmp006Read( TEMP_REG, tempBuf, 2 );
     memcpy(global_local, tempBuf, 2);
     Tdie = ((tempBuf[0] << 8) +  tempBuf[1]) * 0.0078125 + 273.15;

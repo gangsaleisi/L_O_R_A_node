@@ -23,12 +23,10 @@ float get_sensor_value()
 #if 0
       vamb += (float)randr(-1, 11)/10 + 32.0;
 #else
-    Tmp006Write(CONF_REG, default_config, 2);
-    while (i--)
-    {
-      vamb += Tmp006SensorI2c();
-    }
-    vamb = vamb/3;
+    //Tmp006Write(CONF_REG, default_config, 2);
+    vamb = Tmp006SensorI2c();
+    if (vamb == 0)
+      vamb = 25.0;
 #endif
     Tmp006Write(CONF_REG, powerdown_config, 2);
 #else
@@ -82,9 +80,14 @@ float Tmp006SensorI2c( void )
     
     
     Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
-    
+    if(tempBuf[0] == 0 || tempBuf[1] == 0)
+      return 0;
     Tmp006Write( CONF_REG, default_config, 2 );
-    Tmp006Read( CONF_REG, tempBuf, 2 );
+    do
+    {
+      Tmp006Read( CONF_REG, tempBuf, 2 );
+    }while((tempBuf[1] & 0x80) != 0x80);
+    
     Tmp006Read( TEMP_REG, tempBuf, 2 );
     Tdie = ((tempBuf[0] << 8) +  tempBuf[1]) * 0.0078125 + 273.15;
     

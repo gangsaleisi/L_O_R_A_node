@@ -1,6 +1,7 @@
 #include "board.h"
 #include "sensor.h"
 #include "math.h"  
+#define NODE_5
 /*
 MCP9700A:
         Vout = Tc * Ta + V0
@@ -18,7 +19,61 @@ float get_sensor_value()
 
 #elif defined( TMP006 )
     vamb = Tmp006SensorI2c();
-
+#if defined(NODE_89)
+    if(vamb < 24)
+      vamb += 1.5;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 2.0;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.7;
+    else if(vamb >= 32)
+      vamb += 3.1;
+#elif defined(NODE_5)
+    if(vamb < 24)
+      vamb += 1.0;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
+#elif defined(NODE_3)
+    if(vamb < 24)
+      vamb += 2.0;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 2.4;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.8;
+    else if(vamb >= 32)
+      vamb += 3.2;
+#elif defined(NODE_84)
+    if(vamb < 24)
+      vamb += 0;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 0.7;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 1.4;
+    else if(vamb >= 32)
+      vamb += 2.0;
+#elif defined(NODE_80)
+    if(vamb < 24)
+      vamb += 1;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
+#else
+    if(vamb < 24)
+      vamb += 1;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
+#endif
 #else
     //todo
 #endif
@@ -55,6 +110,8 @@ float Tobj;
 uint8_t default_config[2] = {0x75, 0x00};
 uint8_t global_obj[3];
 uint8_t global_local[3];
+uint8_t global_manu[3];
+
 float Tmp006SensorI2c( void )
 {
     uint16_t Tdie_Temp, Vobj_Read;
@@ -62,7 +119,7 @@ float Tmp006SensorI2c( void )
     float Tdie;  
     
     float S,Vos,fVobj;  
-    float S0 = 6.5*pow(10,-14);  
+    float S0 = 6.4*pow(10,-14);  
     float a1 = 1.75*pow(10,-3);  
     float a2 = -1.678*pow(10,-5);  
     float Tref = 298.15;  
@@ -73,9 +130,14 @@ float Tmp006SensorI2c( void )
 
     #if 0
     Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
-    
+    memcpy(global_manu, tempBuf, 2);
+    if(tempBuf[0] == 0 || tempBuf[1] == 0)
+      return -100;
     Tmp006Write( CONF_REG, default_config, 2 );
-    Tmp006Read( CONF_REG, tempBuf, 2 );
+    do 
+    {
+      Tmp006Read( CONF_REG, tempBuf, 2 );
+    }while((tempBuf[1]&0x80) != 0x80);
     //read local temperature
     Tmp006Read( TEMP_REG, tempBuf, 2 );
     memcpy(global_local, tempBuf, 2);
@@ -112,8 +174,10 @@ float Tmp006SensorI2c( void )
     Tobj -= 273.15;  
 #else
     
-   //Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
-    
+    Tmp006Read( MAUN_ID_REG, tempBuf, 2 );
+    memcpy(global_manu, tempBuf, 2);
+    if(tempBuf[0] == 0 || tempBuf[1] == 0)
+      return -100;
     Tmp006Write( CONF_REG, default_config, 2 );
     do 
     {
@@ -128,7 +192,7 @@ float Tmp006SensorI2c( void )
     Vobj_Read  = (tempBuf[0] << 8) + tempBuf[1];
     if(Vobj_Read >= 0x8000)  
     {
-        Vobj = -(0xffff - Vobj_Read)*156.25;  
+        Vobj = -(0xffff - Vobj_Read + 1)*156.25;  
     }
 
     else

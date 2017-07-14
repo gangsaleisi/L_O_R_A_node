@@ -17,7 +17,7 @@ Description: LoRaWAW Class A/C Example
 #include "sensor.h"
 
 #define APP_PORT                                        (2)
-#define APP_DATA_SIZE                                   (20)
+#define APP_DATA_SIZE                                   (28)
 
 #define APP_TX_DUTYCYCLE                                (90000000)     // min
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
@@ -66,6 +66,7 @@ void app_lm_cb (lm_evt_t evt, void *msg)
 }
 extern uint8_t global_local[];
 extern uint8_t global_obj[];
+extern uint8_t global_manu[];
 uint8_t powerdown_config[2] = {0x05, 0x00};
 int main( void )
 {
@@ -80,10 +81,11 @@ int main( void )
     Tmp006Write( CONF_REG, powerdown_config, 2 );
     while(1)
     {
-      sprintf((char *)AppData, "%f\t%x%x\t%x%x\n", (double)get_sensor_value(), global_local[0], global_local[1],global_obj[0],global_obj[1]);
+      sprintf((char *)AppData, "%f\t%x%x\t%x%x\t%x%x\n", (double)get_sensor_value(), 
+              global_manu[0], global_manu[1], global_local[0], global_local[1],global_obj[0],global_obj[1]);
       Tmp006Write( CONF_REG, powerdown_config, 2 );
-      AppData[19] = '\n';
-      SendData(AppData, 20);
+      AppData[27] = '\n';
+      SendData(AppData, 28);
       DelayMs( 1000 );
     }
     /* Uncomment below line to enable class C mode */

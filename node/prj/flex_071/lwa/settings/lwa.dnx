@@ -18,7 +18,7 @@
         <stlinkResetStrategy>3</stlinkResetStrategy>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>3120168527</Checksum>
+        <Checksum>3924529494</Checksum>
     </DebugChecksum>
     <JLinkDriver>
         <CStepIntDis>_ 0</CStepIntDis>
@@ -45,12 +45,7 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\flex_071\lwa\main.c}.116.19" 0 0 1 "" 0 "" 0</Bp0>
-        <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\sensor\sensor.c}.0.1" 0 0 1 "" 0 "" 0</Bp1>
-        <Bp2>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\sensor\sensor.c}.0.1" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\sensor\sensor.c}.0.1" 0 0 1 "" 0 "" 0</Bp3>
-        <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\sensor\sensor.c}.0.1" 0 0 1 "" 0 "" 0</Bp4>
-        <Count>5</Count>
+        <Count>0</Count>
     </Breakpoints2>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>

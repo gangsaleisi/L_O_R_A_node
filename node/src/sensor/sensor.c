@@ -1,6 +1,7 @@
 #include "board.h"
 #include "sensor.h"
 #include "math.h"  
+#define NODE_5
 /*
 MCP9700A:
         Vout = Tc * Ta + V0
@@ -14,19 +15,68 @@ uint8_t powerdown_config[2] = {0x05, 0x00};
 float get_sensor_value()
 {
     float vamb = 0.0;
-    uint8_t i = 3;
 #if defined (MCP9700)
     uint16_t vout = Mcp97SensorAdc();
     vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
-#if 0
-      vamb += (float)randr(-1, 11)/10 + 32.0;
-#else
-    //Tmp006Write(CONF_REG, default_config, 2);
     vamb = Tmp006SensorI2c();
     if (vamb == 0)
       vamb = 25.0;
+#if defined(NODE_89)
+    if(vamb < 24)
+      vamb += 2.5;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 2.8;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 3.1;
+    else if(vamb >= 32)
+      vamb += 3.4;
+#elif defined(NODE_5)
+    if(vamb < 24)
+      vamb += 1.0;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
+#elif defined(NODE_3)
+    if(vamb < 24)
+      vamb += 1.4;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 2.0;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.6;
+    else if(vamb >= 32)
+      vamb += 3.2;
+#elif defined(NODE_84)
+    if(vamb < 24)
+      vamb += 1.0;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
+#elif defined(NODE_80)
+    if(vamb < 24)
+      vamb += 1;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
+#else
+    if(vamb < 24)
+      vamb += 1;
+    else if(vamb >=24 && vamb < 28)
+      vamb += 1.5;
+    else if(vamb >= 28 && vamb < 32)
+      vamb += 2.0;
+    else if(vamb >= 32)
+      vamb += 2.5;
 #endif
     Tmp006Write(CONF_REG, powerdown_config, 2);
 #else
@@ -95,7 +145,7 @@ float Tmp006SensorI2c( void )
     Vobj_Read  = (tempBuf[0] << 8) + tempBuf[1];
     if(Vobj_Read >= 0x8000)  
     {
-        Vobj = -(0xffff - Vobj_Read)*156.25;  
+        Vobj = -(0xffff - Vobj_Read + 1)*156.25;  
     }
 
     else

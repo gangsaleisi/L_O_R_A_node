@@ -9,12 +9,16 @@ Ta:ambient temperature
 V0:sensor output vlotage at 0
 mcp9700A:tc=10,v0=500
 */
+#if defined (MCP9700)
+uint16_t BatteryAdc();
+#endif
 float get_sensor_value()
 {
     float vamb = 0.0;
 #if defined (MCP9700)
-    uint16_t vout = Mcp97SensorAdc();
-    vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
+    uint16_t vout = BatteryAdc();
+    vamb = vout;
+    //vamb = ( float )( vout - TEMP_0_VOL ) /( float )TEMP_COEF;
 
 #elif defined( TMP006 )
     vamb = Tmp006SensorI2c();
@@ -26,6 +30,7 @@ float get_sensor_value()
 }
 #if defined (MCP9700)
 extern Adc_t Adc;
+extern Adc_t Adc2;
 
 uint16_t GetAdcVref()
 {
@@ -37,6 +42,30 @@ uint16_t GetAdcVref()
 
     return voltage;
 }
+uint16_t GetBatteryVref()
+{
+    uint16_t vdiv = 0;
+    uint16_t voltage = 0;
+
+    vdiv = AdcReadChannel( &Adc2, ADC_CHANNEL_VREFINT);
+    voltage = FACTORY_POWER_SUPPLY * ( ( float )VREFINT_CAL / ( float )vdiv );
+
+    return voltage;
+}
+
+uint16_t BatteryAdc()
+{
+    uint16_t vdiv = 0;
+    uint16_t voltage = 0;
+    uint16_t vref = 0;
+
+    vref = GetBatteryVref();
+    vdiv = AdcReadChannel( &Adc2, BAT_LEVEL_CHANNEL3);
+    voltage = vref * ( ( float )vdiv / ( float )ADC_MAX_VALUE );
+
+    return voltage;
+}
+
 uint16_t Mcp97SensorAdc()
 {
     uint16_t vdiv = 0;

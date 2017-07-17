@@ -98,7 +98,9 @@ Description: loramac-node board dependent definitions
 #endif
 
 #define BAT_LEVEL_PIN                               PA_1
+#define BAT_LEVEL_PIN2                              PA_3
 #define BAT_LEVEL_CHANNEL                           ADC_CHANNEL_1
+#define BAT_LEVEL_CHANNEL3                          ADC_CHANNEL_3
 
 #define I2C_SCL                                     PB_6
 #define I2C_SDA                                     PB_7

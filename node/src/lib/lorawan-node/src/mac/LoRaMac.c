@@ -3403,7 +3403,8 @@ LoRaMacStatus_t LoRaMacMlmeRequest( MlmeReq_t *mlmeRequest )
             }
             else
             {
-                ChannelsDatarate = DR_4;
+                //ChannelsDatarate = DR_4; //Donny
+                ChannelsDatarate = DR_0;
             }
 #endif
 

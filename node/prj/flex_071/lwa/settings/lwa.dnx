@@ -68,7 +68,7 @@
     </DisassembleMode>
     <Breakpoints2>
         <Bp0>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\app\flex_071\lwa\main.c}.101.15" 0 0 1 "" 0 "" 0</Bp0>
-        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac.c}.3410.13" 0 0 1 "" 0 "" 0</Bp1>
+        <Bp1>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac.c}.3410.1" 0 0 1 "" 0 "" 0</Bp1>
         <Bp2>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac.c}.2598.5" 0 0 1 "" 0 "" 0</Bp2>
         <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac.c}.2330.5" 0 0 1 "" 0 "" 0</Bp3>
         <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\src\lib\lorawan-node\src\mac\LoRaMac.c}.2434.13" 0 0 1 "" 0 "" 0</Bp4>

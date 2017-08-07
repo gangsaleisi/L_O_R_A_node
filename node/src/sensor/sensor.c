@@ -1,7 +1,7 @@
 #include "board.h"
 #include "sensor.h"
 #include "math.h"  
-#define NODE_5
+//#define NODE_5
 /*
 MCP9700A:
         Vout = Tc * Ta + V0

@@ -6,13 +6,13 @@
 
 "-p" 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 8.0\arm\CONFIG\debugger\ST\STM32L052R8.ddf" 
+"C:\Program Files\IAR Systems\Embedded Workbench 8.0\arm\CONFIG\debugger\ST\STM32L051C8.ddf" 
 
 "--drv_verify_download" 
 
 "--semihosting" 
 
-"--device=STM32L052R8" 
+"--device=STM32L051C8" 
 
 "--drv_communication=USB0" 
 

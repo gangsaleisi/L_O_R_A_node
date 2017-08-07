@@ -107,14 +107,14 @@ int main( void )
               loramac_send_flag = 0;
               sprintf((char *)AppData, "%8.2f", (double)get_sensor_value());
               //jason
-              //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-              if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
+              if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
+              //if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
               sys_sta = SYS_STA_WAIT;
               }else{
                   sys_sta = SYS_STA_IDLE;
                   ReportTimerEvent = false;
                   TimerStop( &ReportTimer );
-                  TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+                  TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE );
                   TimerStart( &ReportTimer );
               }
             }
@@ -133,7 +133,7 @@ int main( void )
             ReportTimerEvent = false;
             if(loramac_send_flag != 1)
             {
-              TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+              TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE );
             }
             else
             {

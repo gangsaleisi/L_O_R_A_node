@@ -15,7 +15,7 @@ Description: LoRaMac-Node application file
 #include "LoRaMac-api-v3.h"
 
 lm_callback_t lm_callback_g;
-#define LOAD_VALUE      0x4
+#define LOAD_VALUE      0x77
 static uint8_t DevEui[] = {
     0x46, 0x4c, 0x45, 0x58, 0x01, 0x01, 0x00, 0x00
 };

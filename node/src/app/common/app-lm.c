@@ -16,7 +16,7 @@ Description: LoRaMac-Node application file
 
 lm_callback_t lm_callback_g;
 //jason
-#define LOAD_VALUE      0x30
+#define LOAD_VALUE      0x72
 static uint8_t DevEui[] = {
     0x46, 0x4c, 0x45, 0x58, 0x01, 0x01, 0x00, 0x00
 };

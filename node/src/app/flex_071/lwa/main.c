@@ -18,7 +18,7 @@ Description: LoRaWAW Class A/C Example
 #define APP_PORT                                        (2)
 #define APP_DATA_SIZE                                   (8)
 
-#define APP_TX_DUTYCYCLE                                (90000000)     // min
+#define APP_TX_DUTYCYCLE                                (30000000)     // min
 #define APP_TX_DUTYCYCLE_RND                            (1500000)   // us
 
 
@@ -105,14 +105,14 @@ int main( void )
             {
               sprintf((char *)AppData, "%8.2f", (double)get_sensor_value());
               //jason
-              //if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
-              if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
+              if( app_lm_send(UNCONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
+              //if( app_lm_send(CONFIRMED, AppData, APP_DATA_SIZE, 0) == 0 ){
               sys_sta = SYS_STA_WAIT;
               }else{
                   sys_sta = SYS_STA_IDLE;
                   ReportTimerEvent = false;
                   TimerStop( &ReportTimer );
-                  TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+                  TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE);
                   TimerStart( &ReportTimer );
               }
             }
@@ -130,7 +130,7 @@ int main( void )
             sys_sta = SYS_STA_IDLE;
 
             ReportTimerEvent = false;
-            TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND ) );
+            TimerSetValue( &ReportTimer, APP_TX_DUTYCYCLE );
             TimerStart( &ReportTimer );
         }
 
